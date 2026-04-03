@@ -151,11 +151,20 @@
         }
         .key-input.locked { color: transparent; text-shadow: 0 0 12px rgba(176, 0, 255, 0.8); letter-spacing: 6px; }
 
-        /* ADVANCED BIOMETRIC SCANNER */
-        .bio-container { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 25px; position: relative; }
+        /* ADVANCED BIOMETRIC SCANNER (BUG FIX WRAPPER) */
+        .bio-container { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            margin-bottom: 25px; position: relative; 
+        }
+        
+        .bio-wrapper {
+            position: relative;
+            width: 90px;
+            height: 90px;
+        }
         
         .bio-btn {
-            width: 90px; height: 90px; border-radius: 50%;
+            width: 100%; height: 100%; border-radius: 50%;
             background: #050508;
             border: 2px solid rgba(176, 0, 255, 0.3);
             display: flex; justify-content: center; align-items: center;
@@ -164,7 +173,6 @@
             transition: all 0.2s; overflow: hidden;
         }
 
-        /* SVG Fingerprint Representation */
         .bio-icon {
             width: 40px; height: 40px; position: relative; z-index: 3;
             background-image: radial-gradient(circle, transparent 30%, rgba(0,229,255,0.4) 31%, rgba(0,229,255,0.4) 40%, transparent 41%, transparent 50%, rgba(0,229,255,0.4) 51%, rgba(0,229,255,0.4) 60%, transparent 61%, transparent 70%, rgba(0,229,255,0.4) 71%, rgba(0,229,255,0.4) 80%, transparent 81%);
@@ -183,10 +191,21 @@
 
         @keyframes laserScan { 0% { top: 10%; } 100% { top: 90%; } }
 
-        .progress-ring { position: absolute; top: -8px; left: -8px; width: 106px; height: 106px; pointer-events: none; transform: rotate(-90deg); }
-        .progress-circle { fill: none; stroke: #00e5ff; stroke-width: 4; stroke-dasharray: 295; stroke-dashoffset: 295; transition: stroke-dashoffset 0.1s linear; filter: drop-shadow(0 0 8px #00e5ff); }
+        .progress-ring { 
+            position: absolute; 
+            top: -8px; left: -8px; 
+            width: 106px; height: 106px; 
+            pointer-events: none; 
+            transform: rotate(-90deg); 
+            z-index: 3;
+        }
+        .progress-circle { 
+            fill: none; stroke: #00e5ff; stroke-width: 4; 
+            stroke-dasharray: 295; stroke-dashoffset: 295; 
+            transition: stroke-dashoffset 0.1s linear; filter: drop-shadow(0 0 8px #00e5ff); 
+        }
 
-        .bio-text { margin-top: 20px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #8a8a9e; letter-spacing: 2px; transition: color 0.3s; }
+        .bio-text { margin-top: 20px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #8a8a9e; letter-spacing: 2px; transition: color 0.3s; text-align: center; }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.03); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.1);
@@ -215,6 +234,7 @@
         .feed-item span.highlight { color: #00e5ff; margin-left: 5px;}
         .feed-item span.vip { color: #ffcc00; margin-left: 5px; }
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
 
         /* TOAST NOTIFICATION */
         .toast-container { position: fixed; top: 25px; right: 25px; z-index: 1000; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
@@ -273,13 +293,15 @@
                 </div>
 
                 <div class="bio-container" id="bioContainer">
-                    <div class="bio-btn" id="bioBtn">
-                        <div class="bio-icon"></div>
-                        <div class="scanner-laser"></div>
+                    <div class="bio-wrapper">
+                        <div class="bio-btn" id="bioBtn">
+                            <div class="bio-icon"></div>
+                            <div class="scanner-laser"></div>
+                        </div>
+                        <svg class="progress-ring">
+                            <circle class="progress-circle" id="progressCircle" cx="53" cy="53" r="47"></circle>
+                        </svg>
                     </div>
-                    <svg class="progress-ring">
-                        <circle class="progress-circle" id="progressCircle" cx="53" cy="53" r="47"></circle>
-                    </svg>
                     <div class="bio-text" id="bioText">AWAITING BIOMETRICS</div>
                 </div>
                 
@@ -354,7 +376,7 @@
         function speakVoice(text) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US'; utterance.rate = 1.2; utterance.pitch = 0.5; // Deeper robot voice
+                utterance.lang = 'en-US'; utterance.rate = 1.2; utterance.pitch = 0.5;
                 window.speechSynthesis.speak(utterance);
             }
         }
@@ -376,7 +398,6 @@
                 let yAxis = (window.innerHeight / 2 - e.pageY) / 30;
                 cardWrapper.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
                 
-                // Move the hologram gradient based on mouse
                 let shimmerX = (e.pageX / window.innerWidth) * 100 - 50;
                 let shimmerY = (e.pageY / window.innerHeight) * 100 - 50;
                 holoShimmer.style.transform = `translate(${shimmerX}%, ${shimmerY}%) translateZ(0)`;
@@ -436,7 +457,7 @@
                 progress += 2.5; 
                 setProgress(progress);
                 if(progress >= 100) { clearInterval(holdTimer); triggerGeneration(); }
-            }, 30); // ~1.2s hold
+            }, 30); 
         }
 
         function endHold(e) {
@@ -449,7 +470,6 @@
         bioBtn.addEventListener('mousedown', startHold); bioBtn.addEventListener('mouseup', endHold);
         bioBtn.addEventListener('mouseleave', endHold); bioBtn.addEventListener('touchstart', startHold); bioBtn.addEventListener('touchend', endHold);
 
-        // HEXADECIMAL SCRAMBLE (More realistic hacker decode)
         function hexScramble(targetValue, duration) {
             const hexChars = '0123456789ABCDEF';
             let iterations = 0; const maxIterations = 40; 
