@@ -3,237 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XIT | VOID CORE</title>
+    <title>XIT | PROTOCOL V27</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=Space+Mono&display=swap');
 
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            --bg: #050505;
+            --bg: #020305;
             --primary: #00e5ff;
-            --accent: #7000ff;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: rgba(15, 18, 25, 0.9);
         }
 
         body {
             background-color: var(--bg);
             color: #fff;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            height: 100vh;
-            width: 100vw;
+            height: 100vh; width: 100vw;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* BACKGROUND NEURAL MESH */
-        #canvas { position: absolute; inset: 0; z-index: -1; opacity: 0.4; }
+        #bgCanvas { position: absolute; inset: 0; z-index: -1; opacity: 0.3; }
+        .ambient-glow { position: absolute; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.03) 0%, transparent 80%); z-index: -2; }
 
-        /* MAIN PREMIUM CARD */
-        .container {
-            width: 90%;
-            max-width: 400px;
+        /* ONE-VIEWPORT CARD */
+        .apex-card {
+            width: 92%; max-width: 360px;
             background: var(--glass);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 40px 30px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            border-radius: 28px;
+            padding: 25px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.9);
             text-align: center;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease-out;
         }
 
-        .header-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(0, 229, 255, 0.1);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: var(--primary);
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            margin-bottom: 20px;
+        /* HUD AREA */
+        .hud-top {
+            display: flex; justify-content: space-between;
+            font-family: 'Space Mono', monospace; font-size: 8px;
+            color: #555; margin-bottom: 20px;
+            border-bottom: 1px solid var(--border); padding-bottom: 8px;
         }
+        .hud-top span { color: var(--primary); }
 
-        .header-status .dot {
-            width: 6px; height: 6px;
-            background: var(--primary);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--primary);
-            animation: pulse 1.5s infinite;
-        }
+        .title { font-size: 26px; font-weight: 800; letter-spacing: -1px; margin-bottom: 2px; }
+        .subtitle { font-size: 9px; color: #444; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; }
 
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-        .title { font-size: 30px; font-weight: 800; letter-spacing: -1px; margin-bottom: 5px; }
-        .subtitle { font-size: 11px; color: #888; letter-spacing: 3px; margin-bottom: 30px; font-weight: 400; text-transform: uppercase; }
-
-        /* INTEGRATED TERMINAL */
-        .terminal {
+        /* INTEGRATED LOGS */
+        .mini-terminal {
             background: rgba(0,0,0,0.4);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 12px;
-            height: 70px;
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: #aaa;
-            text-align: left;
-            overflow: hidden;
-            margin-bottom: 25px;
-            position: relative;
+            padding: 10px; height: 55px;
+            font-family: 'Space Mono', monospace; font-size: 9px;
+            color: #777; text-align: left; overflow: hidden; margin-bottom: 20px;
         }
-        .term-line { margin-bottom: 4px; display: block; }
-        .term-line span { color: var(--primary); }
+        .term-line span { color: var(--primary); margin-right: 4px; }
 
-        /* VOID CORE SCANNER (HOLD) */
-        .scanner-wrap {
+        /* SCANNER MECHANIC (THE FIX) */
+        .scan-box {
             position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 30px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 120px; height: 120px;
+            margin: 0 auto 20px auto;
+            display: flex; justify-content: center; align-items: center;
+            /* Disable selection & calls on this specific box */
+            touch-action: none;
         }
 
         .core-btn {
-            width: 90px;
-            height: 90px;
-            background: radial-gradient(circle, #111 0%, #000 100%);
+            width: 80px; height: 80px;
+            background: #050505;
             border: 2px solid var(--border);
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 10;
-            transition: transform 0.2s, border-color 0.3s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 10;
+            transition: all 0.2s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
-        .core-btn:active { transform: scale(0.95); }
-        .core-btn .icon { width: 30px; height: 30px; border: 2px solid #333; border-radius: 50%; position: relative; }
-        .core-btn .icon::after { content: ''; position: absolute; inset: 6px; border: 2px solid #333; border-radius: 50%; }
+        .core-btn.active { transform: scale(0.9); border-color: var(--primary); box-shadow: 0 0 30px rgba(0, 229, 255, 0.3); }
+
+        .fingerprint-icon {
+            width: 35px; height: 35px;
+            border: 2px solid #222; border-radius: 50%;
+            position: relative;
+        }
+        .fingerprint-icon::after { content: ''; position: absolute; inset: 6px; border: 2px solid #222; border-radius: 50%; }
+        
+        .core-btn.active .fingerprint-icon { border-color: var(--primary); }
+        .core-btn.active .fingerprint-icon::after { border-color: var(--primary); }
 
         .progress-ring {
             position: absolute;
-            inset: 0;
-            width: 120px;
-            height: 120px;
+            width: 120px; height: 120px;
             transform: rotate(-90deg);
-            pointer-events: none;
+            pointer-events: none; z-index: 5;
         }
-
         .progress-ring circle {
             fill: none;
             stroke: var(--primary);
-            stroke-width: 3;
-            stroke-dasharray: 377;
+            stroke-width: 4;
+            stroke-dasharray: 377; /* 2 * PI * 60 */
             stroke-dashoffset: 377;
-            transition: stroke-dashoffset 0.1s linear, stroke 0.3s;
+            transition: stroke-dashoffset 0.1s linear;
         }
 
-        .scanner-label { font-size: 10px; font-weight: 700; color: #555; letter-spacing: 2px; margin-top: 15px; transition: color 0.3s; }
+        .status-label { font-size: 10px; font-weight: 700; color: #444; letter-spacing: 2px; margin-top: 10px; }
 
-        /* OUTPUT KEY */
-        .key-box {
+        /* OUTPUT */
+        .key-display {
             background: rgba(0,0,0,0.6);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 16px;
-            font-family: 'Space Mono', monospace;
-            font-size: 15px;
-            color: #555;
-            letter-spacing: 3px;
-            margin-bottom: 25px;
-            transition: all 0.3s;
+            padding: 15px; font-family: 'Space Mono', monospace;
+            font-size: 14px; color: #333; text-align: center;
+            letter-spacing: 3px; margin-bottom: 20px;
+            transition: all 0.4s;
         }
-        .key-box.active { color: #fff; border-color: var(--primary); box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); }
+        .key-display.ready { color: #fff; border-color: var(--primary); text-shadow: 0 0 10px var(--primary); }
 
-        /* ACTION BUTTONS */
+        /* BUTTONS */
         .btn {
-            width: 100%;
-            padding: 16px;
-            border-radius: 12px;
+            width: 100%; padding: 15px; border-radius: 12px;
             border: 1px solid var(--border);
-            background: rgba(255,255,255,0.03);
-            color: #fff;
-            font-weight: 700;
-            font-size: 12px;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 12px;
-            text-transform: uppercase;
+            background: rgba(255,255,255,0.02);
+            color: #fff; font-weight: 700; font-size: 11px;
+            letter-spacing: 1px; cursor: pointer; transition: 0.3s;
+            margin-bottom: 10px; text-transform: uppercase;
         }
+        .btn-vip { background: var(--primary); color: #000; border: none; font-weight: 800; }
 
-        .btn:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); }
-        .btn-vip { background: var(--primary); color: #000; border: none; margin-top: 10px; }
-        .btn-vip:hover { background: #fff; box-shadow: 0 0 30px var(--primary); }
+        /* MODAL */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-card { background: #08090a; border: 1px solid #ffcc00; border-radius: 24px; padding: 30px; width: 100%; max-width: 350px; text-align: center; }
+        .wa-btn { background: #25D366; color: #000; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 800; margin-bottom: 10px; }
 
-        /* VIP MODAL */
-        .modal {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000;
-            justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px);
-        }
-        .modal-card {
-            background: #0a0a0a; border: 1px solid #ffcc00; border-radius: 20px; padding: 40px;
-            width: 100%; max-width: 380px; text-align: center;
-        }
-        .modal-card h2 { color: #ffcc00; margin-bottom: 20px; }
-        .wa-btn { background: #25D366; color: #000; border: none; padding: 14px; border-radius: 10px; width: 100%; font-weight: 800; margin-bottom: 10px; cursor: pointer; }
-
-        /* OVERLAYS */
-        #flash { position: fixed; inset: 0; background: #fff; z-index: 2000; opacity: 0; pointer-events: none; }
-        .cursor { position: fixed; width: 20px; height: 20px; border: 1px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 5000; transition: transform 0.1s; }
-
-        @media (max-width: 768px) {
-            .container { padding: 30px 20px; }
-            .cursor { display: none; }
-        }
+        #flash { position: fixed; inset: 0; background: #fff; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
     </style>
 </head>
 <body>
 
     <div id="flash"></div>
-    <div class="cursor" id="cursor"></div>
-    <canvas id="canvas"></canvas>
+    <div class="ambient-glow"></div>
+    <canvas id="bgCanvas"></canvas>
 
-    <div class="container" id="card">
-        <div class="header-status">
-            <div class="dot"></div> SERVER ONLINE
+    <div class="apex-card">
+        <div class="hud-top">
+            <div>PWR: <span id="battVal">--%</span></div>
+            <div>NET: <span id="pingVal">--ms</span></div>
+            <div>STB: <span style="color:#00ff88">99%</span></div>
         </div>
 
         <h1 class="title">SENSI KR XIT</h1>
-        <p class="subtitle">Neural Access Portal</p>
+        <p class="subtitle">Neural Signature</p>
 
-        <div class="terminal" id="term">
-            <span class="term-line"><span>></span> System standby.</span>
-            <span class="term-line"><span>></span> Awaiting biometric hold...</span>
+        <div class="mini-terminal" id="term">
+            <div class="term-line"><span>></span> Core initialized...</div>
+            <div class="term-line"><span>></span> Waiting for biometric hold.</div>
         </div>
 
-        <div class="scanner-wrap">
-            <div class="core-btn" id="coreBtn">
-                <div class="icon" id="coreIcon"></div>
+        <div class="scan-box">
+            <div class="core-btn" id="holdBtn">
+                <div class="fingerprint-icon"></div>
             </div>
             <svg class="progress-ring">
                 <circle cx="60" cy="60" r="58"></circle>
             </svg>
-            <div class="scanner-label" id="statusLabel">HOLD TO SCAN</div>
         </div>
+        <div class="status-label" id="label">HOLD TO SCAN</div>
 
-        <div class="key-box" id="keyBox">LOCKED</div>
+        <div class="key-display" id="keyBox">LOCKED</div>
 
         <button class="btn" onclick="copyKey()">COPY SIGNATURE</button>
         <button class="btn btn-vip" onclick="openVip()">GET VIP ACCESS</button>
@@ -241,153 +183,124 @@
 
     <div class="modal" id="vipModal">
         <div class="modal-card">
-            <h2>LIFETIME VIP</h2>
-            <p style="font-size: 12px; color: #888; margin-bottom: 25px; line-height: 1.6;">Akses permanen tanpa batas harian.<br>Prioritas Anti-Ban & Auto Clear Cache.<br>Linked to HWID.</p>
+            <h2 style="color:#ffcc00; margin-bottom:15px;">LIFETIME VIP</h2>
+            <p style="font-size: 11px; color: #555; line-height: 1.6; margin-bottom: 20px;">Manual override enabled, zero-cooldown encryption, and hardware signature locking.</p>
             <button class="wa-btn" onclick="window.open('https://wa.me/+6281225980437')">CONTACT ADMIN 1</button>
             <button class="wa-btn" onclick="window.open('https://wa.me/+6285798209865')">CONTACT ADMIN 2</button>
-            <button class="btn" onclick="closeVip()" style="margin-top: 10px;">BACK</button>
+            <button class="btn" onclick="closeVip()">BACK</button>
         </div>
     </div>
 
     <script>
-        document.addEventListener('contextmenu', e => e.preventDefault());
+        // Disable long-press menu on the whole page for safety
+        window.oncontextmenu = function(event) { event.preventDefault(); event.stopPropagation(); return false; };
 
-        // CURSOR PC
-        const cursor = document.getElementById('cursor');
-        document.addEventListener('mousemove', e => {
-            cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
-            // 3D PARALLAX
-            const x = (window.innerWidth / 2 - e.clientX) / 40;
-            const y = (window.innerHeight / 2 - e.clientY) / 40;
-            document.getElementById('card').style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
-        });
+        // TELEMETRY
+        setInterval(() => {
+            document.getElementById('pingVal').innerText = Math.floor(Math.random()*5+12) + "ms";
+            if(navigator.getBattery) navigator.getBattery().then(b => document.getElementById('battVal').innerText = Math.floor(b.level*100) + "%");
+        }, 2000);
 
-        // BACKGROUND PARTICLES
-        const canvas = document.getElementById('canvas');
+        // BG ANIMATION
+        const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
         let dots = [];
         function init() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             dots = [];
-            for(let i=0; i<80; i++) dots.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5), vy: (Math.random()-0.5) });
+            for(let i=0; i<50; i++) dots.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.2, vy: (Math.random()-0.5)*0.2 });
         }
         function animate() {
             ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = '#00e5ff'; ctx.globalAlpha = 0.3;
-            dots.forEach((d, i) => {
+            ctx.fillStyle = '#00e5ff'; ctx.globalAlpha = 0.15;
+            dots.forEach(d => {
                 d.x += d.vx; d.y += d.vy;
                 if(d.x<0 || d.x>canvas.width) d.vx*=-1; if(d.y<0 || d.y>canvas.height) d.vy*=-1;
-                ctx.beginPath(); ctx.arc(d.x, d.y, 1.5, 0, Math.PI*2); ctx.fill();
-                for(let j=i+1; j<dots.length; j++){
-                    let dist = Math.hypot(d.x-dots[j].x, d.y-dots[j].y);
-                    if(dist<100){ ctx.strokeStyle='#00e5ff'; ctx.lineWidth=0.5; ctx.globalAlpha=0.1; ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(dots[j].x, dots[j].y); ctx.stroke(); }
-                }
+                ctx.beginPath(); ctx.arc(d.x, d.y, 1, 0, Math.PI*2); ctx.fill();
             });
             requestAnimationFrame(animate);
         }
         init(); animate(); window.addEventListener('resize', init);
 
-        // AUDIO
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSfx(f, type='sine', vol=0.05, duration=0.1) {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-            o.type = type; o.frequency.value = f; o.connect(g); g.connect(audioCtx.destination);
-            g.gain.setValueAtTime(vol, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+duration);
-            o.start(); o.stop(audioCtx.currentTime+duration);
-        }
-
-        // HOLD TO SCAN LOGIC
-        const coreBtn = document.getElementById('coreBtn');
+        // THE HOLD FIX LOGIC
+        const holdBtn = document.getElementById('holdBtn');
         const ring = document.querySelector('.progress-ring circle');
-        const statusLabel = document.getElementById('statusLabel');
+        const label = document.getElementById('label');
         const term = document.getElementById('term');
-        let holdTimer;
-        let progress = 0;
-        let isSuccess = false;
+        const keyBox = document.getElementById('keyBox');
+        let progress = 0; let timer; let isSuccess = false;
 
-        function addLog(txt) {
-            const line = document.createElement('span');
-            line.className = 'term-line';
-            line.innerHTML = `<span>></span> ${txt}`;
-            term.appendChild(line);
+        function addLog(msg) {
+            const div = document.createElement('div'); div.className = 'term-line';
+            div.innerHTML = `<span>></span> ${msg}`; term.appendChild(div);
             if(term.children.length > 3) term.removeChild(term.firstChild);
+            term.scrollTop = term.scrollHeight;
         }
 
         function startHold(e) {
             if(isSuccess) return;
-            if(e.type === 'touchstart') e.preventDefault();
+            // PREVENT DEFAULT is key to stopping mobile context menu!
+            e.preventDefault(); 
             
-            progress = 0;
-            statusLabel.innerText = "SCANNING...";
-            statusLabel.style.color = "#00e5ff";
-            addLog("Auth sequence started.");
-            playSfx(400, 'triangle', 0.1, 0.5);
+            holdBtn.classList.add('active');
+            label.innerText = "AUTHENTICATING...";
+            label.style.color = "#00e5ff";
+            addLog("Bio-scan in progress...");
 
-            holdTimer = setInterval(() => {
-                progress += 2;
+            timer = setInterval(() => {
+                progress += 2.5; 
                 ring.style.strokeDashoffset = 377 - (progress / 100) * 377;
-                if(progress % 20 === 0) playSfx(200 + progress*5, 'sine', 0.05);
-
+                
                 if(progress >= 100) {
-                    clearInterval(holdTimer);
-                    completeScan();
+                    clearInterval(timer);
+                    onSuccess();
                 }
-            }, 30);
+            }, 40); // Approx 1.6s to finish
         }
 
-        function endHold() {
+        function endHold(e) {
             if(isSuccess) return;
-            clearInterval(holdTimer);
-            if(progress < 100) {
-                progress = 0;
-                ring.style.strokeDashoffset = 377;
-                statusLabel.innerText = "HOLD TO SCAN";
-                statusLabel.style.color = "#555";
-                addLog("Auth failed: Interrupted.");
-                playSfx(150, 'sawtooth', 0.1);
-            }
+            e.preventDefault();
+            
+            clearInterval(timer);
+            holdBtn.classList.remove('active');
+            progress = 0;
+            ring.style.strokeDashoffset = 377;
+            label.innerText = "HOLD SENSOR";
+            label.style.color = "#444";
+            addLog("Scan failed: Lifted.");
         }
 
-        coreBtn.addEventListener('mousedown', startHold);
-        coreBtn.addEventListener('mouseup', endHold);
-        coreBtn.addEventListener('mouseleave', endHold);
-        coreBtn.addEventListener('touchstart', startHold);
-        coreBtn.addEventListener('touchend', endHold);
+        // Attach events with stopPropagation
+        holdBtn.addEventListener('mousedown', startHold);
+        holdBtn.addEventListener('touchstart', startHold, {passive: false});
+        
+        // Listen globally for lift-up so it cancels even if finger moves off button
+        window.addEventListener('mouseup', endHold);
+        window.addEventListener('touchend', endHold);
 
-        function completeScan() {
+        function onSuccess() {
             isSuccess = true;
+            holdBtn.classList.remove('active');
+            if(navigator.vibrate) navigator.vibrate(100);
+
             document.getElementById('flash').style.opacity = 1;
             setTimeout(() => document.getElementById('flash').style.opacity = 0, 800);
             
-            statusLabel.innerText = "ACCESS GRANTED";
-            statusLabel.style.color = "#00ff88";
-            document.getElementById('coreIcon').style.borderColor = "#00ff88";
-            document.getElementById('coreIcon').style.background = "rgba(0,255,136,0.2)";
-            
-            addLog("Neural link 100% stable.");
-            addLog("Key extracted.");
-            playSfx(800, 'sine', 0.1, 1);
+            label.innerText = "ACCESS GRANTED";
+            label.style.color = "#00ff88";
+            addLog("Encryption breached.");
+            addLog("Key generated.");
 
             const key = btoa(new Date().toISOString().split('T')[0] + "_XIT_SECRET_VIP");
-            const box = document.getElementById('keyBox');
-            box.classList.add('active');
-            
-            // Type effect
-            let i = 0; box.innerText = "";
-            let iv = setInterval(() => {
-                box.innerText += key[i]; i++;
-                if(i >= key.length) clearInterval(iv);
-            }, 40);
+            keyBox.classList.add('ready');
+            keyBox.innerText = key;
         }
 
         function copyKey() {
-            const box = document.getElementById('keyBox');
-            if(!isSuccess) { playSfx(100, 'square'); addLog("Error: Auth required."); return; }
-            const el = document.createElement('textarea'); el.value = box.innerText;
-            document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            addLog("Key copied to clipboard.");
-            playSfx(1000, 'sine');
+            if(!isSuccess) { addLog("Error: Unlocked key first."); return; }
+            navigator.clipboard.writeText(keyBox.innerText);
+            addLog("Signature copied.");
         }
 
         function openVip() { document.getElementById('vipModal').style.display='flex'; }
