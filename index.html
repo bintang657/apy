@@ -3,570 +3,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENSI KR XIT | Dimensional Rift</title>
+    <title>SENSI KR XIT | GOD-MODE</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            cursor: none; /* Custom Cursor Enabled */
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Orbitron', sans-serif; cursor: none; }
 
-        body {
-            background-color: #000000;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            position: relative;
-            perspective: 1200px;
-        }
+        :root { --primary: #00e5ff; --bg: #000205; --text: #fff; }
 
-        /* CUSTOM CURSOR */
-        .custom-cursor {
-            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
-            border: 1px solid #ff2a5f; border-radius: 50%;
-            transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
-            transition: width 0.2s, height 0.2s, background 0.2s;
-            box-shadow: 0 0 10px #ff2a5f;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .custom-cursor::after {
-            content: ''; width: 4px; height: 4px; background: #00e5ff; border-radius: 50%; box-shadow: 0 0 5px #00e5ff;
-        }
-        .cursor-trail {
-            position: fixed; top: 0; left: 0; width: 8px; height: 8px;
-            background: rgba(0, 229, 255, 0.5); border-radius: 50%;
-            transform: translate(-50%, -50%); pointer-events: none; z-index: 9998;
-            transition: top 0.1s linear, left 0.1s linear; filter: blur(2px);
+        body { background-color: var(--bg); color: var(--text); overflow: hidden; height: 100vh; width: 100vw; position: relative; }
+
+        /* 13. CUSTOM CURSOR & TRAIL */
+        .cursor { position: fixed; width: 24px; height: 24px; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 10000; display: flex; justify-content: center; align-items: center; transition: background 0.1s; }
+        .cursor::after { content: ''; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; }
+        .trail { position: fixed; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; filter: blur(4px); transition: 0.1s linear; opacity: 0.5; }
+
+        /* 8. HEXAGONAL FORCEFIELD */
+        .hex-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.05; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='69.28203230275509' viewBox='0 0 40 69.28203230275509' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 17.32050807568877l-20 11.547005383792515L0 17.32050807568877 0 0l20 11.547005383792515L40 0zM0 51.96152422706632l20-11.547005383792515 20 11.547005383792515 0 17.32050807568877-20-11.547005383792515L0 69.28203230275509z' fill='%2300e5ff' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            animation: pulseHex 4s infinite alternate; }
+        @keyframes pulseHex { 0% { opacity: 0.02; } 100% { opacity: 0.1; } }
+
+        /* 6. PARTICLE CANVAS */
+        #particleCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
+
+        /* 15. THREAT RADAR */
+        .radar-scan { position: absolute; top: 50%; left: 50%; width: 150vw; height: 150vw; border-radius: 50%; transform: translate(-50%, -50%); background: conic-gradient(from 0deg, transparent 70%, rgba(255, 0, 85, 0.2) 100%); animation: radarSpin 6s linear infinite; z-index: -3; pointer-events: none; }
+        @keyframes radarSpin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* 2. REAL DEVICE TELEMETRY */
+        .telemetry { position: absolute; top: 15px; left: 20px; font-family: 'Share Tech Mono'; font-size: 11px; color: var(--primary); z-index: 10; text-shadow: 0 0 8px var(--primary); }
+        .telemetry p { margin-bottom: 4px; } .telemetry span { color: #fff; }
+
+        /* MAIN UI CARD */
+        .ui-center { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+        .cyber-card {
+            background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 2px solid var(--primary); border-radius: 16px; padding: 30px; width: 380px; position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0, 229, 255, 0.1);
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        /* BLACK HOLE CANVAS */
-        canvas {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -3;
-        }
+        .title { font-size: 32px; font-weight: 900; text-align: center; letter-spacing: -1px; text-shadow: 0 0 15px var(--primary); }
+        .subtitle { font-family: 'Share Tech Mono'; font-size: 11px; text-align: center; margin-bottom: 20px; color: #aaa; letter-spacing: 3px; }
 
-        .event-horizon-glow {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 40vw; height: 40vw; border-radius: 50%;
-            background: radial-gradient(circle, #000000 20%, rgba(176, 0, 255, 0.1) 40%, rgba(0, 229, 255, 0.05) 60%, transparent 80%);
-            z-index: -2; pointer-events: none; box-shadow: inset 0 0 100px #000;
-        }
+        /* HEAT METER */
+        .meter-container { margin-bottom: 20px; }
+        .meter-info { display: flex; justify-content: space-between; font-family: 'Share Tech Mono'; font-size: 12px; margin-bottom: 5px; }
+        .meter-info span { color: var(--primary); font-weight: bold; }
+        .meter-bar { width: 100%; height: 10px; background: #111; border: 1px solid #333; border-radius: 5px; overflow: hidden; }
+        .meter-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s; box-shadow: 0 0 10px var(--primary); }
 
-        /* EMP SHOCKWAVE & SHAKE */
-        .emp-shockwave {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-            width: 20px; height: 20px;
-            background: radial-gradient(circle, #ffffff 0%, rgba(176,0,255,0.8) 20%, rgba(0,229,255,0.4) 50%, transparent 80%);
-            border-radius: 50%; z-index: 999; pointer-events: none; opacity: 0;
+        /* 11. MULTI-LAYER 3D RINGS */
+        .brute-wrap { display: flex; justify-content: center; margin-bottom: 30px; position: relative; perspective: 500px; }
+        .brute-btn {
+            width: 100px; height: 100px; border-radius: 50%; background: #0a0a0a; border: 3px solid var(--primary);
+            display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; z-index: 5;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px var(--primary); transition: transform 0.05s;
         }
-        .emp-active { animation: empExplode 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; }
+        .brute-btn:active { transform: scale(0.9); }
+        .btn-text { font-size: 18px; font-weight: 900; color: #fff; }
         
-        @keyframes empExplode {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-            30% { opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(400); opacity: 0; filter: hue-rotate(90deg); }
-        }
+        .ring-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 50%; border: 2px dashed var(--primary); }
+        .r1 { transform: rotateX(60deg) rotateY(0deg); animation: spin3D 3s linear infinite; width: 140px; height: 140px; top: -20px; left: -20px; }
+        .r2 { transform: rotateX(0deg) rotateY(60deg); animation: spin3DRev 4s linear infinite; width: 120px; height: 120px; top: -10px; left: -10px; border-style: dotted; }
 
-        .screen-shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-3px, 3px, 0) rotate(-1deg); }
-            20%, 80% { transform: translate3d(5px, -5px, 0) rotate(1deg); }
-            30%, 50%, 70% { transform: translate3d(-8px, 8px, 0) rotate(-2deg); }
-            40%, 60% { transform: translate3d(8px, -8px, 0) rotate(2deg); }
-        }
+        @keyframes spin3D { 100% { transform: rotateX(60deg) rotateY(360deg) rotateZ(360deg); } }
+        @keyframes spin3DRev { 100% { transform: rotateX(360deg) rotateY(60deg) rotateZ(-360deg); } }
 
-        /* MAIN GLASS CARD */
-        .card-wrapper { position: relative; transform-style: preserve-3d; transition: transform 0.15s ease-out; z-index: 1; }
-
-        .glass-card {
-            background: rgba(5, 5, 8, 0.55);
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(0, 229, 255, 0.15);
-            border-top: 1px solid rgba(0, 229, 255, 0.5);
-            border-bottom: 1px solid rgba(255, 42, 95, 0.5);
-            border-radius: 20px;
-            padding: 45px 35px; width: 380px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 1), inset 0 1px 30px rgba(255, 255, 255, 0.05);
-            text-align: center; position: relative; overflow: hidden;
-        }
-
-        /* CYBER DECORATIONS */
-        .glass-card::before {
-            content: ''; position: absolute; top: 10px; left: 10px; width: 20px; height: 20px;
-            border-top: 2px solid #00e5ff; border-left: 2px solid #00e5ff; opacity: 0.5;
-        }
-        .glass-card::after {
-            content: ''; position: absolute; bottom: 10px; right: 10px; width: 20px; height: 20px;
-            border-bottom: 2px solid #ff2a5f; border-right: 2px solid #ff2a5f; opacity: 0.5;
-        }
-
-        .status-badge {
-            background: rgba(0, 229, 255, 0.05); color: #00e5ff; padding: 6px 16px; border-radius: 4px;
-            font-size: 10px; font-weight: 900; letter-spacing: 4px; display: inline-flex; align-items: center;
-            margin-bottom: 15px; border: 1px solid rgba(0, 229, 255, 0.3); text-transform: uppercase;
-        }
-        .status-badge::before {
-            content: ''; width: 6px; height: 6px; background: #00e5ff; border-radius: 50%;
-            margin-right: 8px; box-shadow: 0 0 10px #00e5ff; animation: pulseDot 1s infinite;
-        }
-        @keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.1; } }
-
-        .app-title { font-size: 42px; font-weight: 900; color: #ffffff; letter-spacing: -2px; margin-bottom: 2px; text-shadow: 0 0 30px rgba(176,0,255,0.5); }
-        .subtitle { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #a0a0b0; margin-bottom: 30px; letter-spacing: 3px; }
-
-        /* INPUT FIELD */
-        .input-group { position: relative; margin-bottom: 30px; }
-
+        /* KEY INPUT */
         .key-input {
-            background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(176, 0, 255, 0.3); border-radius: 8px;
-            padding: 20px; width: 100%; color: #d080ff; font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; text-align: center;
-            outline: none; letter-spacing: 4px; transition: all 0.3s ease; box-shadow: inset 0 5px 30px rgba(0,0,0,1);
+            background: #000; border: 1px solid var(--primary); border-radius: 8px; padding: 15px; width: 100%;
+            color: #fff; font-family: 'Share Tech Mono'; font-size: 15px; text-align: center; letter-spacing: 3px; outline: none; margin-bottom: 20px;
         }
-        .key-input.locked { color: transparent; text-shadow: 0 0 15px rgba(0, 229, 255, 0.9); letter-spacing: 8px; }
 
-        /* MULTI-RING VAULT SCANNER */
-        .bio-container { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 25px; position: relative; }
+        .btn-action { background: rgba(0,229,255,0.05); color: var(--primary); border: 1px solid var(--primary); padding: 12px; width: 100%; font-family: 'Orbitron'; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.3s; border-radius: 6px; margin-bottom: 10px; }
+        .btn-action:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); }
         
-        .bio-wrapper { position: relative; width: 110px; height: 110px; transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; justify-content: center; align-items: center;}
-        
-        .bio-btn {
-            width: 60px; height: 60px; border-radius: 50%; background: #050508; border: 2px solid rgba(0, 229, 255, 0.4);
-            display: flex; justify-content: center; align-items: center; position: relative; z-index: 5;
-            box-shadow: 0 0 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0, 229, 255, 0.2); transition: all 0.2s;
+        /* 1. AUDIO VISUALIZER */
+        #audioVisualizer { width: 100%; height: 40px; margin-top: 10px; }
+
+        /* 3 & 4. DRAGGABLE TERMINAL + INPUT */
+        .floating-term {
+            position: absolute; top: 20px; right: 20px; width: 300px; background: rgba(0,0,0,0.85); border: 1px solid #333;
+            border-top: 20px solid #222; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 500;
+            display: flex; flex-direction: column; overflow: hidden;
         }
+        .term-header { position: absolute; top: -20px; left: 0; width: 100%; height: 20px; cursor: move; color: #888; font-family: 'Share Tech Mono'; font-size: 10px; padding-left: 10px; line-height: 20px; }
+        .term-content { height: 120px; padding: 10px; font-family: 'Share Tech Mono'; font-size: 10px; color: #0f0; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-end; }
+        .cmd-line { display: flex; padding: 5px; background: #050505; border-top: 1px solid #222; }
+        .cmd-line span { color: #0f0; font-family: 'Share Tech Mono'; font-size: 10px; margin-right: 5px; }
+        .cmd-input { background: transparent; border: none; color: #fff; font-family: 'Share Tech Mono'; font-size: 10px; outline: none; width: 100%; }
 
-        .bio-icon {
-            width: 20px; height: 20px; border: 2px solid #00e5ff; border-radius: 50%;
-            position: relative; z-index: 6; transition: all 0.3s; box-shadow: 0 0 10px #00e5ff;
+        /* 10. FAKE BLUE SCREEN */
+        #bsod {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0000aa; z-index: 99999;
+            color: #fff; font-family: 'Share Tech Mono'; padding: 50px; flex-direction: column; justify-content: center;
         }
-        .bio-icon::after { content:''; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); width: 8px; height: 8px; background: #00e5ff; border-radius: 50%; }
+        .bsod-title { font-size: 40px; background: #fff; color: #0000aa; display: inline-block; padding: 0 10px; margin-bottom: 30px; font-weight: bold; }
 
-        /* THE RINGS */
-        .vault-ring { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
-        .ring { fill: none; stroke-width: 2; stroke-linecap: round; transform-origin: 50% 50%; transition: stroke 0.3s, filter 0.3s; }
-        
-        .ring-1 { stroke: #00e5ff; stroke-dasharray: 60 40 20 50; animation: spinRing 4s linear infinite; opacity: 0.7; }
-        .ring-2 { stroke: #ff2a5f; stroke-dasharray: 40 80 50 30; animation: spinRingReverse 6s linear infinite; opacity: 0.6; r: 45; }
-        .ring-3 { stroke: #b000ff; stroke-dasharray: 80 20 40 20; animation: spinRing 8s linear infinite; opacity: 0.5; r: 35; }
-
-        @keyframes spinRing { 100% { transform: rotate(360deg); } }
-        @keyframes spinRingReverse { 100% { transform: rotate(-360deg); } }
-
-        /* ALIGN STATE */
-        .bio-wrapper.syncing .ring { animation: alignRings 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; stroke: #00e5ff; filter: drop-shadow(0 0 8px #00e5ff); opacity: 1; }
-        @keyframes alignRings { 100% { transform: rotate(0deg); stroke-dasharray: 300 0; stroke-width: 4; } }
-
-        .bio-btn.pressed { transform: scale(0.9); box-shadow: 0 0 50px rgba(0, 229, 255, 0.6), inset 0 0 30px #00e5ff; border-color: #fff; background: rgba(0,229,255,0.2); }
-        .bio-btn.pressed .bio-icon { background: #fff; border-color: #fff; box-shadow: 0 0 20px #fff; }
-
-        .bio-text { margin-top: 10px; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #8a8a9e; letter-spacing: 3px; transition: color 0.3s; text-align: center; }
-
-        /* BUTTONS */
-        .btn-secondary {
-            background: transparent; color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.3);
-            padding: 16px 20px; width: 100%; border-radius: 8px; font-size: 13px; font-weight: 800;
-            transition: all 0.3s; letter-spacing: 2px; display: block; text-transform: uppercase;
-        }
-        .btn-secondary:hover { background: rgba(0, 229, 255, 0.1); box-shadow: 0 0 20px rgba(0,229,255,0.2); }
-        .btn-secondary:active { transform: scale(0.98); }
-
-        .btn-vip-link {
-            color: #ffcc00; font-size: 12px; font-weight: 800; text-decoration: none;
-            transition: all 0.3s; display: flex; align-items: center; padding: 14px 0; width: 100%; justify-content: center;
-            border-radius: 8px; background: rgba(255, 204, 0, 0.05); border: 1px solid rgba(255, 204, 0, 0.2); margin-top: 15px;
-            letter-spacing: 2px; text-transform: uppercase;
-        }
-        .btn-vip-link:hover { background: rgba(255, 204, 0, 0.15); box-shadow: 0 0 30px rgba(255, 204, 0, 0.2); transform: translateY(-2px); color: #fff; border-color: #fff; }
-
-        /* LIVE ACTIVITY FEED */
-        .activity-feed { position: fixed; bottom: 25px; left: 25px; z-index: 50; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .feed-item {
-            background: rgba(5, 5, 8, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(0,229,255,0.2);
-            padding: 12px 18px; border-radius: 4px; font-family: 'Space Mono', monospace; font-size: 10px; color: #aaa;
-            display: flex; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            animation: slideUp 0.4s ease forwards, fadeOut 0.4s 4s forwards; opacity: 0; transform: translateY(20px); border-left: 4px solid #b000ff;
-        }
-        .feed-item span.highlight { color: #b000ff; margin-left: 5px; font-weight: 700; text-shadow: 0 0 5px #b000ff;}
-        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
-
-        /* TOAST NOTIFICATION */
-        .toast-container { position: fixed; top: 25px; right: 25px; z-index: 1000; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
-        .toast {
-            background: rgba(176, 0, 255, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 18px 24px; border-radius: 4px;
-            font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; box-shadow: 0 15px 50px rgba(176,0,255,0.6);
-            animation: slideInRight 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards, slideOutRight 0.5s 3.5s forwards; opacity: 0; transform: translateX(120%);
-        }
+        /* EMP FLASH & QUAKE */
+        #empFlash { position: fixed; inset: 0; background: #fff; z-index: 9999; opacity: 0; pointer-events: none; }
+        .quake-heavy { animation: heavyShake 0.1s infinite; }
+        @keyframes heavyShake { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-8px, 6px); } }
 
         /* VIP MODAL */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(15px); z-index: 100; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s; }
-        .modal-card { background: #050508; border: 1px solid rgba(255, 204, 0, 0.5); border-radius: 20px; padding: 45px 35px; width: 360px; text-align: center; transform: translateY(30px) scale(0.95); transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 30px 100px rgba(0, 0, 0, 1), inset 0 2px 40px rgba(255, 204, 0, 0.2); }
-        .modal-overlay.active { display: flex; opacity: 1; }
-        .modal-overlay.active .modal-card { transform: translateY(0) scale(1); }
-        .modal-title { font-size: 28px; font-weight: 900; color: #ffffff; margin-bottom: 5px; text-transform: uppercase; letter-spacing: -1px;}
-        .modal-price { font-size: 42px; font-weight: 900; color: #ffcc00; margin-bottom: 30px; font-family: 'Space Mono', monospace; text-shadow: 0 0 20px rgba(255,204,0,0.4);}
-        .modal-features { text-align: left; margin-bottom: 35px; }
-        .feature-item { font-size: 13px; color: #a0a0b0; margin-bottom: 15px; display: flex; font-weight: 400; line-height: 1.5; }
-        .feature-item::before { content: '>'; font-family: 'Space Mono'; color: #ffcc00; font-weight: bold; margin-right: 12px; font-size: 14px; }
-        .founder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-        .btn-founder { background: rgba(37, 211, 102, 0.1); color: #25D366; border: 1px solid rgba(37, 211, 102, 0.4); padding: 16px; border-radius: 8px; font-size: 11px; font-weight: 800; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;}
-        .btn-founder:hover { background: #25D366; color: #000; transform: translateY(-3px); box-shadow: 0 10px 30px rgba(37, 211, 102, 0.5); }
-        .btn-close { background: transparent; color: #8a8a9e; border: none; font-size: 13px; font-weight: 600; margin-top: 10px; transition: color 0.2s; letter-spacing: 2px;}
-        .btn-close:hover { color: #fff; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { background: #050505; border: 2px solid #ffcc00; padding: 30px; width: 350px; text-align: center; border-radius: 8px; }
+        .btn-wa { background: #25D366; color: #000; border: none; padding: 12px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        
+        /* 7. TYPEWRITER EFFECT CLASSES */
+        .typewriter { overflow: hidden; white-space: nowrap; border-right: 2px solid var(--primary); animation: blinkCursor .75s step-end infinite; }
+        @keyframes blinkCursor { from, to { border-color: transparent } 50% { border-color: var(--primary); } }
 
-        /* INIT OVERLAY */
-        #initOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; color: #00e5ff; font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 8px; transition: opacity 0.5s; }
-        .init-pulse { animation: pulse 1.5s infinite; }
     </style>
 </head>
 <body>
 
-    <div id="initOverlay">
-        <div class="init-pulse">ESTABLISH NEURAL LINK</div>
+    <div class="cursor" id="cursor"></div>
+    <div class="trail" id="trail"></div>
+
+    <div id="bsod">
+        <div class="bsod-title">SYSTEM_FATAL_ERROR</div>
+        <p>A problem has been detected and OMNI-NEXUS has been shut down to prevent damage to your hardware.</p><br>
+        <p>CORE_TEMPERATURE_DROP_CRITICAL_FAILURE</p><br>
+        <p>If this is the first time you've seen this Stop error screen, restart your terminal. If you are a weak hacker, give up.</p><br>
+        <p>*** STOP: 0x000000ED (0x80F128D0, 0xc000009c, 0x00000000, 0x00000000)</p><br>
+        <p>Rebooting in <span id="bsodTimer">5</span> seconds...</p>
     </div>
 
-    <div class="custom-cursor" id="cursor"></div>
-    <div class="cursor-trail" id="cursorTrail"></div>
+    <div id="empFlash"></div>
 
-    <div class="event-horizon-glow"></div>
-    <canvas id="vortexCanvas"></canvas>
+    <canvas id="particleCanvas"></canvas>
+    <div class="hex-overlay"></div>
+    <div class="radar-scan"></div>
 
-    <div id="empShockwave" class="emp-shockwave"></div>
+    <div class="telemetry">
+        <p>OP_SYS : <span id="osVal">UNKNOWN</span></p>
+        <p>POWER  : <span id="battVal">SCANNING...</span></p>
+        <p>LATENCY: <span id="pingVal">12ms</span></p>
+    </div>
 
-    <div class="activity-feed" id="activityFeed"></div>
-    <div class="toast-container" id="toastContainer"></div>
-
-    <div class="card-wrapper" id="cardWrapper">
-        <div class="glass-card" id="mainCard">
-            <div class="holo-shimmer" id="holoShimmer"></div>
-            
-            <div class="content-layer">
-                <div class="status-badge">DIMENSIONAL RIFT</div>
-                <div class="app-title">SENSI KR XIT</div>
-                <p class="subtitle">QUANTUM DECRYPTION VAULT</p>
-
-                <div class="input-group">
-                    <input type="text" id="keyDisplay" class="key-input locked" value="[ ENCRYPTED ]" readonly>
-                </div>
-
-                <div class="bio-container" id="bioContainer">
-                    <div class="bio-wrapper" id="bioWrapper">
-                        <svg class="vault-ring">
-                            <circle class="ring ring-1" cx="55" cy="55" r="53"></circle>
-                            <circle class="ring ring-2" cx="55" cy="55" r="44"></circle>
-                            <circle class="ring ring-3" cx="55" cy="55" r="35"></circle>
-                        </svg>
-                        <div class="bio-btn" id="bioBtn">
-                            <div class="bio-icon"></div>
-                        </div>
-                    </div>
-                    <div class="bio-text" id="bioText">HOLD TO SYNC RINGS</div>
-                </div>
-                
-                <button class="btn-secondary" onclick="copyKey()">COPY SIGNATURE</button>
-
-                <span class="btn-vip-link" onclick="openModal()">OBTAIN LIFETIME CLEARANCE</span>
-            </div>
+    <div class="floating-term" id="dragTerm">
+        <div class="term-header" id="termHeader">SYS_LOG_CONSOLE (DRAG ME)</div>
+        <div class="term-content" id="termContent">
+            <div>> Initialization complete.</div>
+            <div>> Type /help for commands.</div>
+        </div>
+        <div class="cmd-line">
+            <span>root@nexus:~#</span>
+            <input type="text" class="cmd-input" id="cmdInput" autocomplete="off" spellcheck="false">
         </div>
     </div>
 
-    <div class="modal-overlay" id="vipModal">
-        <div class="modal-card">
-            <div class="modal-badge">TIER 1 CLASSIFIED</div>
-            <div class="modal-title">LIFETIME VIP</div>
-            <div class="modal-price">Rp 45.000</div>
-            
-            <div class="modal-features">
-                <div class="feature-item">Akses server node tanpa batas waktu</div>
-                <div class="feature-item">Bypass proses sinkronisasi cincin</div>
-                <div class="feature-item">Prioritas protokol Stealth & Anti-Ban</div>
-                <div class="feature-item">Enkripsi Hardware ID (HWID Locked)</div>
+    <div class="ui-center">
+        <div class="cyber-card" id="mainCard">
+            <div class="title" id="twTitle">SENSI KR XIT</div>
+            <div class="subtitle" id="twSub">OMNIVERSE DECRYPTION NODE</div>
+
+            <div class="meter-container">
+                <div class="meter-info">
+                    <span>CORE HEAT</span>
+                    <span id="tempVal">0°C</span>
+                </div>
+                <div class="meter-bar"><div class="meter-fill" id="heatFill"></div></div>
             </div>
 
-            <div class="founder-grid">
-                <button class="btn-founder" onclick="window.location.href='https://wa.me/+6281225980437'">SYS ADMIN 1</button>
-                <button class="btn-founder" onclick="window.location.href='https://wa.me/+6285798209865'">SYS ADMIN 2</button>
+            <div class="brute-wrap">
+                <div class="ring-3d r1" id="ring1"></div>
+                <div class="ring-3d r2" id="ring2"></div>
+                <div class="brute-btn" id="bruteBtn">
+                    <div class="btn-text">TAP</div>
+                </div>
             </div>
-            
-            <button class="btn-close" onclick="closeModal()">Abort Sequence</button>
+
+            <input type="text" id="keyDisplay" class="key-input locked" value="LOCKED" readonly>
+
+            <button class="btn-action" onclick="copyKey()">COPY SIGNATURE</button>
+            <button class="btn-action" style="border-color:#ffcc00; color:#ffcc00;" onclick="document.getElementById('vipModal').style.display='flex'">LIFETIME CLEARANCE (VIP)</button>
+
+            <canvas id="audioVisualizer"></canvas>
+        </div>
+    </div>
+
+    <div class="modal" id="vipModal">
+        <div class="modal-box">
+            <h2 style="color:#ffcc00; margin-bottom:20px; font-weight:900;">LIFETIME VIP</h2>
+            <button class="btn-wa" onclick="window.location.href='https://wa.me/+6281225980437'">SYS ADMIN 1</button>
+            <button class="btn-wa" onclick="window.location.href='https://wa.me/+6285798209865'">SYS ADMIN 2</button>
+            <button class="btn-action" onclick="document.getElementById('vipModal').style.display='none'">CLOSE</button>
         </div>
     </div>
 
     <script>
-        // Anti Inspect
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.onkeydown = function(e) { if(event.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 67 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false; }
+        // Security
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = e => { if(e.keyCode==123 || (e.ctrlKey && e.shiftKey && [73,67,74].includes(e.keyCode)) || (e.ctrlKey && e.keyCode==85)) return false; }
 
-        // CUSTOM CURSOR LOGIC
-        const cursor = document.getElementById('cursor');
-        const trail = document.getElementById('cursorTrail');
-        let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
+        // Global State
+        let heat = 0; const maxHeat = 1000; let isHacked = false; let peakHeatReached = false;
         
-        // Hide cursor on touch devices
-        if(window.matchMedia("(pointer: coarse)").matches) {
-            cursor.style.display = "none"; trail.style.display = "none";
-            document.body.style.cursor = "auto";
+        // 9. DYNAMIC COLOR SHIFT
+        function setRootColor(color) {
+            document.documentElement.style.setProperty('--primary', color);
+            document.getElementById('trail').style.background = color;
         }
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX; mouseY = e.clientY;
-            cursor.style.left = mouseX + 'px'; cursor.style.top = mouseY + 'px';
-            setTimeout(() => { trail.style.left = mouseX + 'px'; trail.style.top = mouseY + 'px'; }, 50);
-        });
-
-        document.addEventListener('mousedown', () => { cursor.style.transform = 'translate(-50%, -50%) scale(0.7)'; cursor.style.background = 'rgba(255, 42, 95, 0.3)'; });
-        document.addEventListener('mouseup', () => { cursor.style.transform = 'translate(-50%, -50%) scale(1)'; cursor.style.background = 'transparent'; });
-
-        // AUDIO ENGINE (Cinematic Spatial 3.0)
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let droneGain;
-
-        function startAmbientDrone() {
-            if(droneGain) return;
-            const osc1 = audioCtx.createOscillator(); osc1.type = 'sawtooth'; osc1.frequency.value = 40; 
-            const osc2 = audioCtx.createOscillator(); osc2.type = 'sine'; osc2.frequency.value = 41; // Create beating effect
-            
-            droneGain = audioCtx.createGain(); droneGain.gain.value = 0;
-            const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 100;
-            
-            // Spatial Panner (Simulate rotating around head)
-            const panner = audioCtx.createStereoPanner();
-            let panVal = 0, panDir = 0.01;
-            setInterval(() => { panVal += panDir; if(Math.abs(panVal) > 0.8) panDir *= -1; panner.pan.value = panVal; }, 50);
-
-            osc1.connect(filter); osc2.connect(filter); filter.connect(panner); panner.connect(droneGain); droneGain.connect(audioCtx.destination);
-            osc1.start(); osc2.start(); droneGain.gain.setTargetAtTime(0.015, audioCtx.currentTime, 5);
-        }
-
-        function playSound(type) {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            
-            if(type === 'charge') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(50, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(2000, audioCtx.currentTime + 1.5);
-                gain.gain.setValueAtTime(0.01, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.5);
-                osc.start(); osc.stop(audioCtx.currentTime + 1.5);
-            } else if(type === 'emp') {
-                // Low sub drop
-                osc.type = 'sine'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 1.2);
-                gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-                osc.start(); osc.stop(audioCtx.currentTime + 1.2);
-            } else if(type === 'click') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(3000, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.03, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-            }
-        }
-
-        function speakVoice(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US'; utterance.rate = 1.0; utterance.pitch = 0.2; // Super deep
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        document.getElementById('initOverlay').addEventListener('click', function() {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            startAmbientDrone(); playSound('click');
-            this.style.opacity = '0'; setTimeout(() => this.style.display = 'none', 500);
-        });
-
-        // EVENT HORIZON (BLACK HOLE) CANVAS
-        const canvas = document.getElementById('vortexCanvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, cx, cy;
-        let vortexParticles = [];
-        let globalSpeed = 1;
-
-        function initVortex() {
-            width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight;
-            cx = width / 2; cy = height / 2;
-            vortexParticles = [];
-            for(let i=0; i<400; i++) {
-                vortexParticles.push({
-                    angle: Math.random() * Math.PI * 2,
-                    radius: Math.random() * Math.max(width, height),
-                    speed: Math.random() * 0.02 + 0.005,
-                    size: Math.random() * 2 + 0.5,
-                    color: Math.random() > 0.5 ? '#00e5ff' : '#b000ff'
-                });
-            }
-        }
-        initVortex();
-        window.addEventListener('resize', initVortex);
-
-        // React to mouse movement
-        document.addEventListener('mousemove', (e) => {
-            let dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-            globalSpeed = 1 + (dist / width) * 3; // Speeds up when mouse is far from center
-        });
-
-        function animateVortex() {
-            ctx.fillStyle = 'rgba(0,0,0,0.15)'; // Trail effect
-            ctx.fillRect(0, 0, width, height);
-            
-            vortexParticles.forEach(p => {
-                p.angle += p.speed * globalSpeed;
-                p.radius -= 0.5 * globalSpeed; // Suck into center
-                
-                if(p.radius < 20) { p.radius = Math.max(width, height); p.angle = Math.random() * Math.PI * 2; }
-                
-                let x = cx + Math.cos(p.angle) * p.radius;
-                let y = cy + Math.sin(p.angle) * p.radius;
-                let alpha = Math.min(1, 300 / p.radius); // Brighter near center
-                
-                ctx.beginPath(); ctx.arc(x, y, p.size, 0, Math.PI*2);
-                ctx.fillStyle = p.color; ctx.globalAlpha = alpha; ctx.fill(); ctx.globalAlpha = 1;
+        // 2. DEVICE TELEMETRY (Battery API)
+        const osVal = document.getElementById('osVal'); const battVal = document.getElementById('battVal');
+        osVal.innerText = /Android/i.test(navigator.userAgent) ? "ANDROID_OS" : /iPhone|iPad/i.test(navigator.userAgent) ? "IOS_SECURE" : "DESKTOP_NODE";
+        if (navigator.getBattery) {
+            navigator.getBattery().then(b => {
+                battVal.innerText = Math.floor(b.level * 100) + "% " + (b.charging ? "(CHARGING)" : "");
+                b.addEventListener('levelchange', () => battVal.innerText = Math.floor(b.level * 100) + "%");
             });
-            requestAnimationFrame(animateVortex);
+        } else { battVal.innerText = "N/A (ENCRYPTED)"; }
+        setInterval(() => { document.getElementById('pingVal').innerText = Math.floor(Math.random()*15+5) + "ms"; }, 2000);
+
+        // 13. CUSTOM CURSOR
+        const cursor = document.getElementById('cursor'); const trail = document.getElementById('trail');
+        if(window.matchMedia("(pointer: coarse)").matches) { cursor.style.display="none"; trail.style.display="none"; document.body.style.cursor="auto"; }
+        document.addEventListener('mousemove', e => {
+            cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+            setTimeout(() => { trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; }, 40);
+        });
+
+        // 3. DRAGGABLE TERMINAL
+        const dragTerm = document.getElementById('dragTerm'); const termHeader = document.getElementById('termHeader');
+        let isDragging = false, offsetX, offsetY;
+        termHeader.addEventListener('mousedown', e => { isDragging = true; offsetX = e.clientX - dragTerm.offsetLeft; offsetY = e.clientY - dragTerm.offsetTop; });
+        document.addEventListener('mousemove', e => { if(isDragging) { dragTerm.style.left = (e.clientX - offsetX) + 'px'; dragTerm.style.top = (e.clientY - offsetY) + 'px'; } });
+        document.addEventListener('mouseup', () => isDragging = false);
+        // Touch support for drag
+        termHeader.addEventListener('touchstart', e => { isDragging = true; offsetX = e.touches[0].clientX - dragTerm.offsetLeft; offsetY = e.touches[0].clientY - dragTerm.offsetTop; });
+        document.addEventListener('touchmove', e => { if(isDragging) { dragTerm.style.left = (e.touches[0].clientX - offsetX) + 'px'; dragTerm.style.top = (e.touches[0].clientY - offsetY) + 'px'; } });
+        document.addEventListener('touchend', () => isDragging = false);
+
+        // 4. INTERACTIVE TERMINAL
+        const termContent = document.getElementById('termContent'); const cmdInput = document.getElementById('cmdInput');
+        function printTerm(txt, color="#0f0") {
+            const div = document.createElement('div'); div.innerText = `> ${txt}`; div.style.color = color;
+            termContent.appendChild(div); termContent.scrollTop = termContent.scrollHeight;
         }
-        animateVortex();
-
-        // HOLOGRAPHIC TILT & SHIMMER
-        const cardWrapper = document.getElementById('cardWrapper');
-        const holoShimmer = document.getElementById('holoShimmer');
-        const bioBtn = document.getElementById('bioBtn');
-        
-        document.addEventListener('mousemove', (e) => {
-            if(window.innerWidth > 768) {
-                let xAxis = (window.innerWidth / 2 - e.pageX) / 40; let yAxis = (window.innerHeight / 2 - e.pageY) / 40;
-                cardWrapper.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-                
-                let shimmerX = (e.pageX / window.innerWidth) * 100 - 50; let shimmerY = (e.pageY / window.innerHeight) * 100 - 50;
-                holoShimmer.style.transform = `translate(${shimmerX}%, ${shimmerY}%) translateZ(0)`;
-
-                // Magnetic Button
-                const btnRect = bioBtn.getBoundingClientRect();
-                const btnX = btnRect.left + btnRect.width / 2; const btnY = btnRect.top + btnRect.height / 2;
-                const dist = Math.hypot(e.pageX - btnX, e.pageY - btnY);
-                
-                if(dist < 100 && !isGenerating) {
-                    bioBtn.style.transform = `translate(${(e.pageX - btnX)*0.4}px, ${(e.pageY - btnY)*0.4}px)`;
-                } else if(!isGenerating) {
-                    bioBtn.style.transform = `translate(0px, 0px)`;
-                }
+        cmdInput.addEventListener('keypress', e => {
+            if(e.key === 'Enter') {
+                const val = cmdInput.value.trim().toLowerCase(); printTerm(cmdInput.value, "#fff"); cmdInput.value = "";
+                if(val === '/help') { printTerm("/vip - Get Access"); printTerm("/clear - Clear logs"); printTerm("/hack - Auto breach"); }
+                else if(val === '/clear') termContent.innerHTML = '';
+                else if(val === '/vip') document.getElementById('vipModal').style.display='flex';
+                else if(val === '/hack' && !isHacked) forceHack();
+                else printTerm(`Command not found: ${val}`, "red");
             }
         });
+
+        // 5. SECRET EASTER EGG (Konami Code Style: X-I-T)
+        let keysPressed = '';
+        window.addEventListener('keydown', e => {
+            keysPressed += e.key.toLowerCase();
+            if(keysPressed.includes('xit') && !isHacked) { printTerm("EASTER EGG TRIGGERED. ROOT ACCESS GRANTED.", "yellow"); forceHack(); keysPressed=''; }
+            if(keysPressed.length > 5) keysPressed = keysPressed.slice(-5);
+        });
+
+        function forceHack() { heat = 100; updateUI(); triggerBreach(); }
+
+        // 1 & 14. SPATIAL AUDIO & VISUALIZER
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioCtx.createAnalyser(); analyser.fftSize = 64;
+        const bufferLength = analyser.frequencyBinCount; const dataArray = new Uint8Array(bufferLength);
+        const visCanvas = document.getElementById('audioVisualizer'); const visCtx = visCanvas.getContext('2d');
+        visCanvas.width = 320; visCanvas.height = 40;
+
+        function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+            analyser.getByteFrequencyData(dataArray);
+            visCtx.clearRect(0, 0, visCanvas.width, visCanvas.height);
+            let barWidth = (visCanvas.width / bufferLength) * 2.5; let barHeight; let x = 0;
+            for(let i=0; i<bufferLength; i++) {
+                barHeight = dataArray[i] / 2;
+                visCtx.fillStyle = document.documentElement.style.getPropertyValue('--primary') || '#00e5ff';
+                visCtx.fillRect(x, visCanvas.height - barHeight + 5, barWidth, barHeight);
+                x += barWidth + 2;
+            }
+        }
+        drawVisualizer();
+
+        let droneOsc, dronePan;
+        function initAudio() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            if(droneOsc) return;
+            droneOsc = audioCtx.createOscillator(); droneOsc.type = 'sawtooth'; droneOsc.frequency.value = 40;
+            dronePan = audioCtx.createStereoPanner();
+            const gain = audioCtx.createGain(); gain.gain.value = 0.05;
+            droneOsc.connect(dronePan); dronePan.connect(gain); gain.connect(analyser); analyser.connect(audioCtx.destination);
+            droneOsc.start();
+        }
+        document.body.addEventListener('click', initAudio);
+        document.body.addEventListener('touchstart', initAudio);
+
+        // Spatial Audio update based on mouse
+        document.addEventListener('mousemove', e => {
+            if(dronePan) { let pan = (e.clientX / window.innerWidth) * 2 - 1; dronePan.pan.value = pan; }
+            if(droneOsc && !isHacked) { droneOsc.frequency.value = 40 + (e.clientY / window.innerHeight) * 20; } // Pitch alters on Y
+        });
+
+        // 12. MULTILINGUAL AI VOICE
+        function speakAI(text, lang='en-US') {
+            if('speechSynthesis' in window) {
+                const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = 1.1; u.pitch = 0.6;
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        // 6. PHYSICS PARTICLE CANVAS (Repulsion)
+        const pCanvas = document.getElementById('particleCanvas'); const pCtx = pCanvas.getContext('2d');
+        pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight;
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 100 };
+        document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
         
-        document.addEventListener('mouseleave', () => { cardWrapper.style.transform = `rotateY(0deg) rotateX(0deg)`; holoShimmer.style.transform = `translate(0%, 0%) translateZ(0)`; bioBtn.style.transform = `translate(0px, 0px)`; });
+        for(let i=0; i<150; i++) particles.push({ x: Math.random()*pCanvas.width, y: Math.random()*pCanvas.height, size: Math.random()*2+1, baseX: 0, baseY: 0, vx: Math.random()*2-1, vy: Math.random()*2-1 });
 
-        // ACTIVITY FEED
-        const feedActions = [{text:"breached security node", type:"highlight"}, {text:"acquired Tier 1 Access", type:"highlight"}];
-        function spawnFeed() {
-            const container = document.getElementById('activityFeed');
-            const item = document.createElement('div'); item.className = 'feed-item';
-            const randomUser = "ENTITY_" + Math.floor(Math.random() * 8999 + 1000);
-            const randomAction = feedActions[Math.floor(Math.random() * feedActions.length)];
-            item.innerHTML = `${randomUser} <span class="${randomAction.type}">${randomAction.text}</span>`;
-            container.appendChild(item);
-            setTimeout(() => { item.remove(); }, 4000); setTimeout(spawnFeed, Math.random() * 5000 + 2000); 
-        }
-        setTimeout(spawnFeed, 2000);
-
-        function showToast(message) {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div'); toast.className = 'toast'; toast.innerText = message;
-            container.appendChild(toast); setTimeout(() => { toast.remove(); }, 3500);
-        }
-
-        const modal = document.getElementById('vipModal');
-        function openModal() { playSound('click'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10); }
-        function closeModal() { playSound('click'); modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 400); }
-
-        // MULTI-RING SYNC LOGIC
-        const bioWrapper = document.getElementById('bioWrapper');
-        const bioText = document.getElementById('bioText');
-        const keyInput = document.getElementById('keyDisplay');
-        const mainCard = document.getElementById('mainCard');
-        let holdTimer; let progress = 0; let isGenerating = false; let isComplete = false;
-
-        function startHold(e) {
-            if(e.type === 'touchstart') e.preventDefault();
-            if(isGenerating || isComplete) return;
-            playSound('charge');
-            bioText.innerText = "SYNCING DIMENSIONS..."; bioText.style.color = "#00e5ff";
-            bioBtn.classList.add('pressed');
-            
-            holdTimer = setInterval(() => {
-                progress += 3; // Fills in ~1.5s
-                if(progress >= 100) { clearInterval(holdTimer); triggerGeneration(); }
-            }, 45); 
-        }
-
-        function endHold(e) {
-            if(e.type === 'touchend') e.preventDefault();
-            if(isGenerating || isComplete) return;
-            clearInterval(holdTimer); progress = 0;
-            bioText.innerText = "HOLD TO SYNC RINGS"; bioText.style.color = "#8a8a9e";
-            bioBtn.classList.remove('pressed');
-        }
-
-        bioBtn.addEventListener('mousedown', startHold); bioBtn.addEventListener('mouseup', endHold);
-        bioBtn.addEventListener('mouseleave', endHold); bioBtn.addEventListener('touchstart', startHold); bioBtn.addEventListener('touchend', endHold);
-
-        // ALIEN DECODE EFFECT
-        function alienScramble(targetValue, duration) {
-            const alienChars = '⎍⎎⎏⎐⎑⎒⎓⎔⎕⎖⎗⎘ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let iterations = 0; const maxIterations = 45; 
-            const intervalTime = duration / maxIterations;
-            keyInput.classList.remove('locked');
-
-            const interval = setInterval(() => {
-                keyInput.value = targetValue.split('').map((char, i) => i < iterations / (maxIterations / targetValue.length) ? targetValue[i] : alienChars[Math.floor(Math.random() * alienChars.length)]).join('');
-                iterations++;
-                if (iterations >= maxIterations) {
-                    clearInterval(interval); keyInput.value = targetValue;
-                    speakVoice("Dimensional rift secured. Token acquired.");
-                    showToast("Decryption 100% Successful.");
-                    bioText.innerText = "RINGS SYNCHRONIZED"; bioText.style.color = "#fff";
-                    bioWrapper.style.transform = `translate(0px, 0px)`; // Reset magnet
-                }
-            }, intervalTime);
-        }
-
-        async function triggerGeneration() {
-            isGenerating = true; isComplete = true;
-            bioText.innerText = "DIMENSION BREACHED"; bioText.style.color = "#fff";
-            
-            // Align Rings
-            bioWrapper.classList.add('syncing');
-            
-            setTimeout(() => {
-                playSound('emp');
-                document.getElementById('empShockwave').classList.add('emp-active');
-                document.body.classList.add('screen-shake');
-                mainCard.classList.add('glitch-active');
+        function animateParticles() {
+            pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+            let color = document.documentElement.style.getPropertyValue('--primary') || '#00e5ff';
+            pCtx.fillStyle = color;
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0 || p.x>pCanvas.width) p.vx *= -1; if(p.y<0 || p.y>pCanvas.height) p.vy *= -1;
                 
-                setTimeout(() => {
-                    document.body.classList.remove('screen-shake');
-                    document.getElementById('empShockwave').classList.remove('emp-active');
-                    mainCard.classList.remove('glitch-active');
-                    
-                    const today = new Date();
-                    const dateString = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, '0') + "-" + String(today.getDate()).padStart(2, '0');
-                    const finalKey = btoa(dateString + "_XIT_SECRET_VIP"); 
-                    
-                    alienScramble(finalKey, 2000);
-                }, 600); 
-            }, 800); // Wait for rings to visually align
+                // Repulsion
+                let dx = mouse.x - p.x; let dy = mouse.y - p.y; let dist = Math.sqrt(dx*dx + dy*dy);
+                if(dist < mouse.radius) { p.x -= dx/10; p.y -= dy/10; }
+
+                pCtx.beginPath(); pCtx.arc(p.x, p.y, p.size, 0, Math.PI*2); pCtx.fill();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // 7. TYPEWRITER BOOT
+        function typeWriter(el, text, speed) {
+            el.innerText = ''; el.classList.add('typewriter');
+            let i = 0;
+            let iv = setInterval(() => { el.innerText += text.charAt(i); i++; if(i>=text.length) { clearInterval(iv); el.classList.remove('typewriter'); } }, speed);
+        }
+        window.onload = () => {
+            typeWriter(document.getElementById('twTitle'), "SENSI KR XIT", 100);
+            setTimeout(() => typeWriter(document.getElementById('twSub'), "OMNIVERSE DECRYPTION NODE", 50), 1500);
+        };
+
+        // BRUTE FORCE LOGIC
+        const bruteBtn = document.getElementById('bruteBtn'); const heatFill = document.getElementById('heatFill');
+        const tempVal = document.getElementById('tempVal');
+        
+        setInterval(() => {
+            if(!isHacked && heat > 0) {
+                heat -= 0.8; if(heat < 0) heat = 0;
+                updateUI();
+                // 10. BSOD PENALTY
+                if(peakHeatReached && heat === 0 && !isHacked) {
+                    document.getElementById('bsod').style.display = 'flex';
+                    speakAI("System failure. Operator terminated.", "en-US");
+                    let cd = 5; let bsodIv = setInterval(() => { cd--; document.getElementById('bsodTimer').innerText = cd; if(cd<=0){ clearInterval(bsodIv); document.getElementById('bsod').style.display='none'; peakHeatReached=false; } }, 1000);
+                }
+            }
+        }, 50);
+
+        function updateUI() {
+            heatFill.style.width = `${heat}%`;
+            let currentTemp = Math.floor((heat/100) * maxHeat);
+            tempVal.innerText = `${currentTemp}°C`;
+
+            if(heat > 80) {
+                peakHeatReached = true; setRootColor('#b000ff'); // Purple
+                document.body.classList.add('quake-heavy');
+            } else if(heat > 50) {
+                setRootColor('#ffcc00'); // Yellow
+                document.body.classList.remove('quake-heavy');
+            } else {
+                setRootColor('#00e5ff'); // Cyan
+                document.body.classList.remove('quake-heavy');
+            }
+        }
+
+        bruteBtn.addEventListener('mousedown', tapCore);
+        bruteBtn.addEventListener('touchstart', tapCore);
+
+        function tapCore(e) {
+            if(e.type==='touchstart') e.preventDefault();
+            if(isHacked) return;
+            initAudio();
+            
+            heat += 5; if(heat>=100) { heat=100; triggerBreach(); }
+            updateUI();
+            
+            // Tap sound
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(analyser); analyser.connect(audioCtx.destination);
+            o.type = 'square'; o.frequency.value = 200 + (heat*5); g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.1);
+            o.start(); o.stop(audioCtx.currentTime+0.1);
+
+            if(heat === 50) speakAI("警告、温度が上昇しています", "ja-JP"); // Japanese warning
+            if(heat === 85) speakAI("Critical. Overload imminent.", "en-US");
+            if(Math.random()>0.7) printTerm(`Brute force attempt: Hash ${Math.floor(Math.random()*9999)}`);
+        }
+
+        function triggerBreach() {
+            isHacked = true; document.body.classList.remove('quake-heavy');
+            document.getElementById('empFlash').style.opacity = '1';
+            document.getElementById('empFlash').style.transition = 'opacity 1.5s';
+            setTimeout(()=> document.getElementById('empFlash').style.opacity = '0', 100);
+            
+            setRootColor('#0f0'); // Green success
+            printTerm("FIREWALL BREACHED. GENERATING TOKEN.", "#0f0");
+            speakAI("Взлом завершен. Доступ разрешен.", "ru-RU"); // Russian "Hack complete. Access granted."
+            
+            const today = new Date(); const dStr = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,'0') + "-" + String(today.getDate()).padStart(2,'0');
+            const k = btoa(dStr + "_XIT_SECRET_VIP");
+            
+            // Matrix decode
+            const ki = document.getElementById('keyDisplay'); ki.classList.remove('locked');
+            let c=0; let iv=setInterval(()=>{ ki.value=k.split('').map((ch,i)=>i<c/(20/k.length)?k[i]:'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random()*26)]).join(''); c++; if(c>=20){clearInterval(iv);ki.value=k;} },50);
         }
 
         function copyKey() {
-            playSound('click');
-            if(keyInput.classList.contains('locked') || keyInput.value.includes('⎍')) { showToast("Error: Synchronize rings first."); return; }
-            keyInput.select(); document.execCommand("copy"); showToast("Signature copied to clipboard.");
+            const ki = document.getElementById('keyDisplay');
+            if(ki.classList.contains('locked')) { printTerm("ERR: NO KEY", "red"); return; }
+            ki.select(); document.execCommand("copy"); printTerm("COPIED TO CLIPBOARD", "yellow");
         }
     </script>
 </body>
