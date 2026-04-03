@@ -3,290 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XENOS COMMAND | INFINITY CORE</title>
+    <title>XIT | VOID CORE</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap');
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; cursor: none; }
-        :root { --primary: #00e5ff; --bg: #000105; --text: #fff; --accent: #ff0055; --panel: rgba(10, 15, 25, 0.7); }
-        
-        body { background-color: var(--bg); color: var(--text); overflow: hidden; height: 100vh; width: 100vw; font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center; align-items: center; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Mono&display=swap');
 
-        /* ADVANCED BACKGROUND */
-        #nebulaCanvas { position: absolute; inset: 0; z-index: -5; opacity: 0.6; }
-        .grid-3d { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: linear-gradient(rgba(0, 229, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.1) 1px, transparent 1px); background-size: 60px 60px; transform: rotateX(65deg); z-index: -4; pointer-events: none; animation: gridDrive 2s linear infinite; }
-        @keyframes gridDrive { 0% { transform: rotateX(65deg) translateY(0); } 100% { transform: rotateX(65deg) translateY(60px); } }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
 
-        /* CUSTOM CURSOR */
-        .cursor { position: fixed; width: 35px; height: 35px; border: 1px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 10000; display: flex; justify-content: center; align-items: center; mix-blend-mode: difference; transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .cursor::after { content: ''; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
-        .trail { position: fixed; width: 8px; height: 8px; background: var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; filter: blur(4px); opacity: 0.4; transition: 0.12s linear; }
-
-        /* HUD & TELEMETRY */
-        .hud-left { position: absolute; top: 20px; left: 20px; font-family: 'Share Tech Mono'; font-size: 9px; color: var(--primary); z-index: 100; text-shadow: 0 0 5px var(--primary); }
-        .hud-line { margin-bottom: 5px; }
-        .hud-line span { color: #fff; }
-
-        /* MODULAR PANELS */
-        .ui-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 10; perspective: 1500px; width: 100%; max-width: 420px; padding: 20px; }
-        
-        .floating-panel { background: var(--panel); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); width: 100%; transition: transform 0.2s ease-out; transform-style: preserve-3d; }
-        
-        /* TERMINAL PANEL */
-        .term-panel { height: 130px; display: flex; flex-direction: column; overflow: hidden; border-top: 15px solid #1a1a1a; }
-        .term-header { height: 15px; width: 100%; position: absolute; top: -15px; display: flex; align-items: center; padding-left: 10px; font-family: 'Share Tech Mono'; font-size: 8px; color: #888; }
-        .term-body { flex: 1; padding: 10px; font-family: 'Share Tech Mono'; font-size: 10px; color: #0f0; overflow-y: auto; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,0,0.01) 2px, rgba(0,255,0,0.01) 4px); }
-        .term-input-line { display: flex; padding: 6px; background: #050505; border-top: 1px solid #222; align-items: center; }
-        .term-input-line span { color: #0f0; margin-right: 8px; font-weight: bold; font-size: 10px; }
-        .cmd-in { background: transparent; border: none; color: #fff; font-size: 10px; outline: none; width: 100%; font-family: 'Share Tech Mono'; }
-
-        /* MAIN ACTION PANEL */
-        .main-panel { padding: 30px; text-align: center; border-bottom: 2px solid var(--accent); }
-        .title { font-size: 28px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 0 15px var(--primary); margin-bottom: 15px; }
-        
-        .meter-container { margin-bottom: 25px; }
-        .meter-fill { height: 6px; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent)); box-shadow: 0 0 10px var(--primary); border-radius: 3px; transition: 0.1s linear; }
-        .meter-bg { width: 100%; height: 6px; background: #000; border-radius: 3px; border: 1px solid #222; margin-top: 5px; }
-
-        /* INFINITY CORE BUTTON */
-        .core-wrap { display: flex; justify-content: center; align-items: center; height: 120px; position: relative; margin-bottom: 20px; }
-        .brute-btn { 
-            width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, #111, #000); border: 2px solid var(--primary); 
-            display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; z-index: 10;
-            box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); transition: 0.1s;
+        :root {
+            --bg: #050505;
+            --primary: #00e5ff;
+            --accent: #7000ff;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
         }
-        .brute-btn:active { transform: scale(0.9); box-shadow: 0 0 50px var(--primary); }
-        .ring-3d { position: absolute; border: 1px dashed var(--primary); border-radius: 50%; pointer-events: none; }
-        .r1 { width: 140px; height: 140px; animation: spin 4s linear infinite; }
-        .r2 { width: 120px; height: 120px; border-color: var(--accent); animation: spinRev 3s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes spinRev { 100% { transform: rotate(-360deg); } }
 
-        /* KEY INPUT */
-        .key-display { background: #000; border: 1px solid var(--primary); border-radius: 6px; padding: 15px; width: 100%; color: #fff; font-family: 'Share Tech Mono'; font-size: 15px; text-align: center; letter-spacing: 5px; outline: none; margin-bottom: 15px; box-shadow: inset 0 0 15px #000; }
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
 
-        /* BUTTON ACTIONS */
-        .btn-action { background: rgba(0,229,255,0.05); color: var(--primary); border: 1px solid var(--primary); padding: 14px; width: 100%; font-size: 11px; font-weight: 900; cursor: pointer; border-radius: 4px; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; margin-bottom: 10px; }
-        .btn-action:hover { background: var(--primary); color: #000; box-shadow: 0 0 30px var(--primary); }
-        .btn-vip { border-color: #ffcc00; color: #ffcc00; background: rgba(255, 204, 0, 0.05); }
-        .btn-vip:hover { background: #ffcc00; color: #000; box-shadow: 0 0 40px #ffcc00; }
+        /* BACKGROUND NEURAL MESH */
+        #canvas { position: absolute; inset: 0; z-index: -1; opacity: 0.4; }
 
-        /* TICKER */
-        .ticker { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.9); padding: 5px; font-family: 'Share Tech Mono'; font-size: 9px; color: #ffcc00; white-space: nowrap; border-top: 1px solid #333; z-index: 1000; overflow: hidden; }
-        .ticker-inner { display: inline-block; animation: tickerScroll 20s linear infinite; }
-        @keyframes tickerScroll { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+        /* MAIN PREMIUM CARD */
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 40px 30px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            text-align: center;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
 
-        /* MODALS & OVERLAYS */
-        #empFlash { position: fixed; inset: 0; background: #fff; z-index: 99999; opacity: 0; pointer-events: none; }
-        .quake { animation: earthquake 0.5s infinite; }
-        @keyframes earthquake { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(-5px, 5px); } 75% { transform: translate(5px, -5px); } }
+        .header-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 229, 255, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--primary);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            margin-bottom: 20px;
+        }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-card { background: #050508; border: 2px solid #ffcc00; border-radius: 12px; padding: 30px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 0 60px rgba(255,204,0,0.3); }
+        .header-status .dot {
+            width: 6px; height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulse 1.5s infinite;
+        }
 
-        /* MOBILE OPTIMIZATION */
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .title { font-size: 30px; font-weight: 800; letter-spacing: -1px; margin-bottom: 5px; }
+        .subtitle { font-size: 11px; color: #888; letter-spacing: 3px; margin-bottom: 30px; font-weight: 400; text-transform: uppercase; }
+
+        /* INTEGRATED TERMINAL */
+        .terminal {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            height: 70px;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: #aaa;
+            text-align: left;
+            overflow: hidden;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        .term-line { margin-bottom: 4px; display: block; }
+        .term-line span { color: var(--primary); }
+
+        /* VOID CORE SCANNER (HOLD) */
+        .scanner-wrap {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .core-btn {
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle, #111 0%, #000 100%);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.2s, border-color 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .core-btn:active { transform: scale(0.95); }
+        .core-btn .icon { width: 30px; height: 30px; border: 2px solid #333; border-radius: 50%; position: relative; }
+        .core-btn .icon::after { content: ''; position: absolute; inset: 6px; border: 2px solid #333; border-radius: 50%; }
+
+        .progress-ring {
+            position: absolute;
+            inset: 0;
+            width: 120px;
+            height: 120px;
+            transform: rotate(-90deg);
+            pointer-events: none;
+        }
+
+        .progress-ring circle {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 3;
+            stroke-dasharray: 377;
+            stroke-dashoffset: 377;
+            transition: stroke-dashoffset 0.1s linear, stroke 0.3s;
+        }
+
+        .scanner-label { font-size: 10px; font-weight: 700; color: #555; letter-spacing: 2px; margin-top: 15px; transition: color 0.3s; }
+
+        /* OUTPUT KEY */
+        .key-box {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: 'Space Mono', monospace;
+            font-size: 15px;
+            color: #555;
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+        .key-box.active { color: #fff; border-color: var(--primary); box-shadow: 0 0 20px rgba(0, 229, 255, 0.2); }
+
+        /* ACTION BUTTONS */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: #fff;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .btn:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); }
+        .btn-vip { background: var(--primary); color: #000; border: none; margin-top: 10px; }
+        .btn-vip:hover { background: #fff; box-shadow: 0 0 30px var(--primary); }
+
+        /* VIP MODAL */
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000;
+            justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px);
+        }
+        .modal-card {
+            background: #0a0a0a; border: 1px solid #ffcc00; border-radius: 20px; padding: 40px;
+            width: 100%; max-width: 380px; text-align: center;
+        }
+        .modal-card h2 { color: #ffcc00; margin-bottom: 20px; }
+        .wa-btn { background: #25D366; color: #000; border: none; padding: 14px; border-radius: 10px; width: 100%; font-weight: 800; margin-bottom: 10px; cursor: pointer; }
+
+        /* OVERLAYS */
+        #flash { position: fixed; inset: 0; background: #fff; z-index: 2000; opacity: 0; pointer-events: none; }
+        .cursor { position: fixed; width: 20px; height: 20px; border: 1px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 5000; transition: transform 0.1s; }
+
         @media (max-width: 768px) {
-            .hud-left { top: 10px; left: 10px; font-size: 7px; line-height: 1.2; }
-            .ui-layout { padding: 10px; gap: 12px; }
-            .main-panel { padding: 20px; }
-            .title { font-size: 22px; }
-            .term-panel { height: 100px; }
+            .container { padding: 30px 20px; }
+            .cursor { display: none; }
         }
     </style>
 </head>
-<body class="crt">
+<body>
 
-    <canvas id="nebulaCanvas"></canvas>
-    <div class="grid-3d"></div>
-    <div class="ambient-glow"></div>
-    <div id="empFlash"></div>
-
+    <div id="flash"></div>
     <div class="cursor" id="cursor"></div>
-    <div class="trail" id="trail"></div>
+    <canvas id="canvas"></canvas>
 
-    <div class="hud-left">
-        <div class="hud-line">SYSTEM_NODE: <span>XENOS-CORE-01</span></div>
-        <div class="hud-line">ACCESS_LVL: <span style="color:red">CLASSIFIED</span></div>
-        <div class="hud-line">UPTIME: <span id="uptimeVal">00:00:00</span></div>
-        <div class="hud-line">BATT: <span id="battVal">--%</span> | <span id="voltVal">3.82V</span></div>
-        <div class="hud-line">LATENCY: <span id="pingVal">12ms</span></div>
-        <div class="hud-line">CORE_STABILITY: <span id="stabVal">99.8%</span></div>
-    </div>
-
-    <div class="ui-layout">
-        
-        <div class="floating-panel term-panel" id="p1">
-            <div class="term-header">STDOUT_LOG_STREAM</div>
-            <div class="term-body" id="termBody">> Uplink ready.<br>> Awaiting neural tap sequence...</div>
-            <div class="term-input-line">
-                <span>~#</span><input type="text" class="cmd-in" id="cmdIn" spellcheck="false" autocomplete="off">
-            </div>
+    <div class="container" id="card">
+        <div class="header-status">
+            <div class="dot"></div> SERVER ONLINE
         </div>
 
-        <div class="floating-panel main-panel" id="p2">
-            <div class="title" id="twTitle">XENOS COMMAND</div>
-            <div class="subtitle" id="twSub">INFINITY_CORE_DECRYPTION</div>
+        <h1 class="title">SENSI KR XIT</h1>
+        <p class="subtitle">Neural Access Portal</p>
 
-            <div class="meter-container">
-                <div style="display:flex; justify-content:space-between; font-family:'Share Tech Mono'; font-size:11px; margin-bottom:5px">
-                    <span>CORE_HEAT</span><span id="heatVal">0°C</span>
-                </div>
-                <div class="meter-bg"><div class="meter-fill" id="meterFill"></div></div>
-            </div>
-
-            <div class="core-wrap">
-                <div class="ring-3d r1"></div><div class="ring-3d r2"></div>
-                <div class="brute-btn" id="bruteBtn"><span class="btn-text">TAP</span></div>
-            </div>
-
-            <input type="text" id="keyDisplay" class="key-display" value="[ LOCKED ]" readonly>
-
-            <button class="btn-action" onclick="copyKey()">EXTRACT SIGNATURE</button>
-            <button class="btn-action btn-vip" onclick="document.getElementById('vipModal').style.display='flex'">OVERRIDE_VIP_PROTOCOL</button>
-            
-            <canvas id="audioVis" style="width:100%; height:25px; margin-top:15px"></canvas>
+        <div class="terminal" id="term">
+            <span class="term-line"><span>></span> System standby.</span>
+            <span class="term-line"><span>></span> Awaiting biometric hold...</span>
         </div>
 
-    </div>
-
-    <div class="ticker">
-        <div class="ticker-inner" id="tickerMsg">
-            USER_62812*** PURCHASED VIP LICENSE... SYSTEM_BREACH_IN_PROGRESS... ENCRYPTION_STABLE... NODE_SYNC_SUCCESSFUL...
+        <div class="scanner-wrap">
+            <div class="core-btn" id="coreBtn">
+                <div class="icon" id="coreIcon"></div>
+            </div>
+            <svg class="progress-ring">
+                <circle cx="60" cy="60" r="58"></circle>
+            </svg>
+            <div class="scanner-label" id="statusLabel">HOLD TO SCAN</div>
         </div>
+
+        <div class="key-box" id="keyBox">LOCKED</div>
+
+        <button class="btn" onclick="copyKey()">COPY SIGNATURE</button>
+        <button class="btn btn-vip" onclick="openVip()">GET VIP ACCESS</button>
     </div>
 
     <div class="modal" id="vipModal">
         <div class="modal-card">
-            <h2 style="color:#ffcc00; margin-bottom:15px; font-weight:900; letter-spacing:2px">CLEARANCE: VIP</h2>
-            <div style="font-family:'Share Tech Mono'; font-size:10px; color:#0f0; text-align:left; line-height:1.6; margin-bottom:20px">
-                > Lifetime server access encrypted.<br>
-                > Manual override enabled.<br>
-                > Stealth mode anti-ban active.<br>
-                > Linked to HWID signature.
-            </div>
-            <button class="btn-action" style="background:#25D366; color:#000; border:none;" onclick="window.open('https://wa.me/+6281225980437')">CONTACT ADMIN 1</button>
-            <button class="btn-action" style="background:#25D366; color:#000; border:none;" onclick="window.open('https://wa.me/+6285798209865')">CONTACT ADMIN 2</button>
-            <button class="btn-action" onclick="document.getElementById('vipModal').style.display='none'">CANCEL</button>
+            <h2>LIFETIME VIP</h2>
+            <p style="font-size: 12px; color: #888; margin-bottom: 25px; line-height: 1.6;">Akses permanen tanpa batas harian.<br>Prioritas Anti-Ban & Auto Clear Cache.<br>Linked to HWID.</p>
+            <button class="wa-btn" onclick="window.open('https://wa.me/+6281225980437')">CONTACT ADMIN 1</button>
+            <button class="wa-btn" onclick="window.open('https://wa.me/+6285798209865')">CONTACT ADMIN 2</button>
+            <button class="btn" onclick="closeVip()" style="margin-top: 10px;">BACK</button>
         </div>
     </div>
 
     <script>
-        // Security
         document.addEventListener('contextmenu', e => e.preventDefault());
-        document.onkeydown = e => { if(e.keyCode==123 || (e.ctrlKey && e.shiftKey && [73,67,74].includes(e.keyCode)) || (e.ctrlKey && e.keyCode==85)) return false; }
 
-        let heat = 0; let isHacked = false; let startTime = Date.now();
+        // CURSOR PC
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', e => {
+            cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+            // 3D PARALLAX
+            const x = (window.innerWidth / 2 - e.clientX) / 40;
+            const y = (window.innerHeight / 2 - e.clientY) / 40;
+            document.getElementById('card').style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+        });
 
-        // 1. NEBULA CANVAS
-        const nCanvas = document.getElementById('nebulaCanvas'); const nCtx = nCanvas.getContext('2d');
-        let nParticles = [];
-        function initNebula() {
-            nCanvas.width = window.innerWidth; nCanvas.height = window.innerHeight; nParticles = [];
-            for(let i=0; i<100; i++) nParticles.push({ x: Math.random()*nCanvas.width, y: Math.random()*nCanvas.height, s: Math.random()*2, vx: Math.random()-0.5, vy: Math.random()-0.5 });
+        // BACKGROUND PARTICLES
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let dots = [];
+        function init() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            dots = [];
+            for(let i=0; i<80; i++) dots.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5), vy: (Math.random()-0.5) });
         }
-        function drawNebula() {
-            nCtx.clearRect(0,0,nCanvas.width,nCanvas.height);
-            nCtx.fillStyle = heat > 800 ? '#ff0055' : '#00e5ff';
-            nParticles.forEach(p => {
-                p.x += p.vx; p.y += p.vy;
-                if(p.x<0 || p.x>nCanvas.width) p.vx *= -1; if(p.y<0 || p.y>nCanvas.height) p.vy *= -1;
-                nCtx.beginPath(); nCtx.arc(p.x, p.y, p.s, 0, Math.PI*2); nCtx.fill();
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = '#00e5ff'; ctx.globalAlpha = 0.3;
+            dots.forEach((d, i) => {
+                d.x += d.vx; d.y += d.vy;
+                if(d.x<0 || d.x>canvas.width) d.vx*=-1; if(d.y<0 || d.y>canvas.height) d.vy*=-1;
+                ctx.beginPath(); ctx.arc(d.x, d.y, 1.5, 0, Math.PI*2); ctx.fill();
+                for(let j=i+1; j<dots.length; j++){
+                    let dist = Math.hypot(d.x-dots[j].x, d.y-dots[j].y);
+                    if(dist<100){ ctx.strokeStyle='#00e5ff'; ctx.lineWidth=0.5; ctx.globalAlpha=0.1; ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(dots[j].x, dots[j].y); ctx.stroke(); }
+                }
             });
-            requestAnimationFrame(drawNebula);
+            requestAnimationFrame(animate);
         }
-        initNebula(); drawNebula(); window.addEventListener('resize', initNebula);
+        init(); animate(); window.addEventListener('resize', init);
 
-        // TELEMETRY
-        setInterval(() => {
-            let d = Date.now() - startTime;
-            let s = Math.floor(d/1000)%60; let m = Math.floor(d/60000)%60; let h = Math.floor(d/3600000);
-            document.getElementById('uptimeVal').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-            document.getElementById('pingVal').innerText = Math.floor(Math.random()*15+8)+"ms";
-            document.getElementById('stabVal').innerText = (99 + Math.random()).toFixed(1)+"%";
-            if(navigator.getBattery) navigator.getBattery().then(b => document.getElementById('battVal').innerText = Math.floor(b.level*100)+"%");
-        }, 1000);
-
-        // AUDIO ENGINE
+        // AUDIO
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioCtx.createAnalyser(); analyser.fftSize = 64;
-        const dataArr = new Uint8Array(analyser.frequencyBinCount);
-
-        function playSfx(f, type='square', v=0.05) {
+        function playSfx(f, type='sine', vol=0.05, duration=0.1) {
             if(audioCtx.state === 'suspended') audioCtx.resume();
             const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-            o.type = type; o.frequency.value = f; o.connect(g); g.connect(analyser); analyser.connect(audioCtx.destination);
-            g.gain.setValueAtTime(v, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.1);
-            o.start(); o.stop(audioCtx.currentTime+0.1);
+            o.type = type; o.frequency.value = f; o.connect(g); g.connect(audioCtx.destination);
+            g.gain.setValueAtTime(vol, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+duration);
+            o.start(); o.stop(audioCtx.currentTime+duration);
         }
-        function speak(t) { if(window.speechSynthesis) { const u = new SpeechSynthesisUtterance(t); u.rate = 1.1; u.pitch = 0.5; window.speechSynthesis.speak(u); } }
 
-        // MOUSE PARALLAX & CURSOR
-        document.addEventListener('mousemove', e => {
-            const cur = document.getElementById('cursor'); cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
-            const tr = document.getElementById('trail'); setTimeout(() => { tr.style.left = e.clientX + 'px'; tr.style.top = e.clientY + 'px'; }, 60);
+        // HOLD TO SCAN LOGIC
+        const coreBtn = document.getElementById('coreBtn');
+        const ring = document.querySelector('.progress-ring circle');
+        const statusLabel = document.getElementById('statusLabel');
+        const term = document.getElementById('term');
+        let holdTimer;
+        let progress = 0;
+        let isSuccess = false;
+
+        function addLog(txt) {
+            const line = document.createElement('span');
+            line.className = 'term-line';
+            line.innerHTML = `<span>></span> ${txt}`;
+            term.appendChild(line);
+            if(term.children.length > 3) term.removeChild(term.firstChild);
+        }
+
+        function startHold(e) {
+            if(isSuccess) return;
+            if(e.type === 'touchstart') e.preventDefault();
             
-            const x = (window.innerWidth/2 - e.clientX)/50; const y = (window.innerHeight/2 - e.clientY)/50;
-            document.querySelectorAll('.floating-panel').forEach(p => p.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`);
-        });
+            progress = 0;
+            statusLabel.innerText = "SCANNING...";
+            statusLabel.style.color = "#00e5ff";
+            addLog("Auth sequence started.");
+            playSfx(400, 'triangle', 0.1, 0.5);
 
-        // TERMINAL LOGIC
-        const cmdIn = document.getElementById('cmdIn');
-        const termBody = document.getElementById('termBody');
-        function pTerm(t, c='#0f0') { const d = document.createElement('div'); d.innerHTML = "> " + t; d.style.color = c; termBody.appendChild(d); termBody.scrollTop = 9999; }
-        
-        cmdIn.addEventListener('keypress', e => {
-            if(e.key === 'Enter') {
-                const v = cmdIn.value.toLowerCase(); cmdIn.value = "";
-                if(v === '/help') pTerm("Commands: /vip, /clear, /overdrive, /access");
-                else if(v === '/clear') termBody.innerHTML = "";
-                else if(v === '/overdrive') { heat = 950; updateUI(); pTerm("OVERDRIVE ENGAGED", "red"); }
-                else if(v === '/access') pTerm("DECRYPTING BYPASS NODES...", "yellow");
-                else pTerm("UNKNOWN_CMD");
-            }
-        });
+            holdTimer = setInterval(() => {
+                progress += 2;
+                ring.style.strokeDashoffset = 377 - (progress / 100) * 377;
+                if(progress % 20 === 0) playSfx(200 + progress*5, 'sine', 0.05);
 
-        // BRUTE FORCE MECHANIC
-        const bruteBtn = document.getElementById('bruteBtn');
-        const tap = (e) => {
-            if(e.type==='touchstart') e.preventDefault();
-            if(isHacked) return;
-            playSfx(100 + heat, 'sawtooth');
-            heat += 10; if(heat >= 1000) triggerBreach();
-            updateUI();
-            if(Math.random() > 0.8) pTerm("Core Strike: " + heat + "°C");
-        };
-        bruteBtn.addEventListener('mousedown', tap); bruteBtn.addEventListener('touchstart', tap);
-        setInterval(() => { if(heat > 0 && !isHacked) { heat -= 4; updateUI(); } }, 50);
-
-        function updateUI() {
-            document.getElementById('meterFill').style.width = (heat/10) + "%";
-            document.getElementById('heatVal').innerText = heat + "°C";
-            if(heat > 800) { document.body.classList.add('quake'); document.documentElement.style.setProperty('--primary', '#ff0055'); }
-            else { document.body.classList.remove('quake'); document.documentElement.style.setProperty('--primary', '#00e5ff'); }
+                if(progress >= 100) {
+                    clearInterval(holdTimer);
+                    completeScan();
+                }
+            }, 30);
         }
 
-        function triggerBreach() {
-            isHacked = true; heat = 1000; updateUI();
-            document.getElementById('empFlash').style.opacity = 1; setTimeout(()=>document.getElementById('empFlash').style.opacity=0, 1500);
-            speak("Infinity core breached. Access granted.");
+        function endHold() {
+            if(isSuccess) return;
+            clearInterval(holdTimer);
+            if(progress < 100) {
+                progress = 0;
+                ring.style.strokeDashoffset = 377;
+                statusLabel.innerText = "HOLD TO SCAN";
+                statusLabel.style.color = "#555";
+                addLog("Auth failed: Interrupted.");
+                playSfx(150, 'sawtooth', 0.1);
+            }
+        }
+
+        coreBtn.addEventListener('mousedown', startHold);
+        coreBtn.addEventListener('mouseup', endHold);
+        coreBtn.addEventListener('mouseleave', endHold);
+        coreBtn.addEventListener('touchstart', startHold);
+        coreBtn.addEventListener('touchend', endHold);
+
+        function completeScan() {
+            isSuccess = true;
+            document.getElementById('flash').style.opacity = 1;
+            setTimeout(() => document.getElementById('flash').style.opacity = 0, 800);
+            
+            statusLabel.innerText = "ACCESS GRANTED";
+            statusLabel.style.color = "#00ff88";
+            document.getElementById('coreIcon').style.borderColor = "#00ff88";
+            document.getElementById('coreIcon').style.background = "rgba(0,255,136,0.2)";
+            
+            addLog("Neural link 100% stable.");
+            addLog("Key extracted.");
+            playSfx(800, 'sine', 0.1, 1);
+
             const key = btoa(new Date().toISOString().split('T')[0] + "_XIT_SECRET_VIP");
-            const ki = document.getElementById('keyDisplay');
-            let c=0; let iv = setInterval(() => {
-                ki.value = Math.random().toString(16).substr(2, 12).toUpperCase(); c++;
-                if(c > 30) { clearInterval(iv); ki.value = key; ki.style.color = "#0f0"; ki.style.boxShadow = "0 0 20px #0f0"; }
+            const box = document.getElementById('keyBox');
+            box.classList.add('active');
+            
+            // Type effect
+            let i = 0; box.innerText = "";
+            let iv = setInterval(() => {
+                box.innerText += key[i]; i++;
+                if(i >= key.length) clearInterval(iv);
             }, 40);
         }
 
-        function copyKey() { const ki = document.getElementById('keyDisplay'); if(ki.value.includes(']')) { speak("Error"); pTerm("SIGNATURE_LOCKED", "red"); } else { ki.select(); document.execCommand('copy'); speak("Signature extracted"); pTerm("SIG_EXTRACT_SUCCESS"); } }
+        function copyKey() {
+            const box = document.getElementById('keyBox');
+            if(!isSuccess) { playSfx(100, 'square'); addLog("Error: Auth required."); return; }
+            const el = document.createElement('textarea'); el.value = box.innerText;
+            document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            addLog("Key copied to clipboard.");
+            playSfx(1000, 'sine');
+        }
 
-        // AUDIO VISUALIZER
-        const vCanvas = document.getElementById('audioVis'); const vCtx = vCanvas.getContext('2d');
-        function drawVis() {
-            requestAnimationFrame(drawVis); analyser.getByteFrequencyData(dataArr); vCtx.clearRect(0,0,300,25);
-            for(let i=0; i<32; i++) {
-                let h = dataArr[i]/8; vCtx.fillStyle = document.documentElement.style.getPropertyValue('--primary'); vCtx.fillRect(i*10, 25-h, 6, h);
-            }
-        } drawVis();
+        function openVip() { document.getElementById('vipModal').style.display='flex'; }
+        function closeVip() { document.getElementById('vipModal').style.display='none'; }
     </script>
 </body>
 </html>
