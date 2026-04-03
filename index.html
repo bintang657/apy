@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENSI KR XIT | GOD-MODE</title>
+    <title>SENSI KR XIT | GOD-MODE V19.1</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 
@@ -13,39 +13,37 @@
 
         body { background-color: var(--bg); color: var(--text); overflow: hidden; height: 100vh; width: 100vw; position: relative; }
 
-        /* 13. CUSTOM CURSOR & TRAIL */
+        /* CUSTOM CURSOR & TRAIL */
         .cursor { position: fixed; width: 24px; height: 24px; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 10000; display: flex; justify-content: center; align-items: center; transition: background 0.1s; }
         .cursor::after { content: ''; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; }
         .trail { position: fixed; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; filter: blur(4px); transition: 0.1s linear; opacity: 0.5; }
 
-        /* 8. HEXAGONAL FORCEFIELD */
+        /* HEXAGONAL FORCEFIELD */
         .hex-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.05; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg width='40' height='69.28203230275509' viewBox='0 0 40 69.28203230275509' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 17.32050807568877l-20 11.547005383792515L0 17.32050807568877 0 0l20 11.547005383792515L40 0zM0 51.96152422706632l20-11.547005383792515 20 11.547005383792515 0 17.32050807568877-20-11.547005383792515L0 69.28203230275509z' fill='%2300e5ff' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E");
             animation: pulseHex 4s infinite alternate; }
         @keyframes pulseHex { 0% { opacity: 0.02; } 100% { opacity: 0.1; } }
 
-        /* 6. PARTICLE CANVAS */
+        /* PARTICLE CANVAS & RADAR */
         #particleCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
-
-        /* 15. THREAT RADAR */
         .radar-scan { position: absolute; top: 50%; left: 50%; width: 150vw; height: 150vw; border-radius: 50%; transform: translate(-50%, -50%); background: conic-gradient(from 0deg, transparent 70%, rgba(255, 0, 85, 0.2) 100%); animation: radarSpin 6s linear infinite; z-index: -3; pointer-events: none; }
         @keyframes radarSpin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
-        /* 2. REAL DEVICE TELEMETRY */
-        .telemetry { position: absolute; top: 15px; left: 20px; font-family: 'Share Tech Mono'; font-size: 11px; color: var(--primary); z-index: 10; text-shadow: 0 0 8px var(--primary); }
+        /* TELEMETRY */
+        .telemetry { position: absolute; top: 15px; left: 20px; font-family: 'Share Tech Mono'; font-size: 11px; color: var(--primary); z-index: 10; text-shadow: 0 0 8px var(--primary); pointer-events: none;}
         .telemetry p { margin-bottom: 4px; } .telemetry span { color: #fff; }
 
         /* MAIN UI CARD */
-        .ui-center { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+        .ui-center { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow-y: auto; padding: 20px; }
         .cyber-card {
             background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 2px solid var(--primary); border-radius: 16px; padding: 30px; width: 380px; position: relative;
+            border: 2px solid var(--primary); border-radius: 16px; padding: 30px; width: 100%; max-width: 380px; position: relative;
             box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0, 229, 255, 0.1);
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        .title { font-size: 32px; font-weight: 900; text-align: center; letter-spacing: -1px; text-shadow: 0 0 15px var(--primary); }
-        .subtitle { font-family: 'Share Tech Mono'; font-size: 11px; text-align: center; margin-bottom: 20px; color: #aaa; letter-spacing: 3px; }
+        .title { font-size: 32px; font-weight: 900; text-align: center; letter-spacing: -1px; text-shadow: 0 0 15px var(--primary); white-space: pre-wrap; }
+        .subtitle { font-family: 'Share Tech Mono'; font-size: 11px; text-align: center; margin-bottom: 20px; color: #aaa; letter-spacing: 3px; white-space: pre-wrap;}
 
         /* HEAT METER */
         .meter-container { margin-bottom: 20px; }
@@ -54,8 +52,10 @@
         .meter-bar { width: 100%; height: 10px; background: #111; border: 1px solid #333; border-radius: 5px; overflow: hidden; }
         .meter-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s; box-shadow: 0 0 10px var(--primary); }
 
-        /* 11. MULTI-LAYER 3D RINGS */
-        .brute-wrap { display: flex; justify-content: center; margin-bottom: 30px; position: relative; perspective: 500px; }
+        /* MULTI-LAYER 3D RINGS (BUG FIX) */
+        .brute-wrap { display: flex; justify-content: center; align-items: center; margin-bottom: 30px; margin-top: 20px; perspective: 600px; }
+        .brute-center { position: relative; width: 100px; height: 100px; display: flex; justify-content: center; align-items: center; }
+        
         .brute-btn {
             width: 100px; height: 100px; border-radius: 50%; background: #0a0a0a; border: 3px solid var(--primary);
             display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; z-index: 5;
@@ -64,9 +64,9 @@
         .brute-btn:active { transform: scale(0.9); }
         .btn-text { font-size: 18px; font-weight: 900; color: #fff; }
         
-        .ring-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 50%; border: 2px dashed var(--primary); }
-        .r1 { transform: rotateX(60deg) rotateY(0deg); animation: spin3D 3s linear infinite; width: 140px; height: 140px; top: -20px; left: -20px; }
-        .r2 { transform: rotateX(0deg) rotateY(60deg); animation: spin3DRev 4s linear infinite; width: 120px; height: 120px; top: -10px; left: -10px; border-style: dotted; }
+        .ring-3d { position: absolute; top: 50%; left: 50%; border-radius: 50%; pointer-events: none; border: 2px dashed var(--primary); }
+        .r1 { width: 150px; height: 150px; margin-top: -75px; margin-left: -75px; transform: rotateX(60deg) rotateY(0deg); animation: spin3D 3s linear infinite; }
+        .r2 { width: 130px; height: 130px; margin-top: -65px; margin-left: -65px; border-style: dotted; transform: rotateX(0deg) rotateY(60deg); animation: spin3DRev 4s linear infinite; }
 
         @keyframes spin3D { 100% { transform: rotateX(60deg) rotateY(360deg) rotateZ(360deg); } }
         @keyframes spin3DRev { 100% { transform: rotateX(360deg) rotateY(60deg) rotateZ(-360deg); } }
@@ -80,42 +80,52 @@
         .btn-action { background: rgba(0,229,255,0.05); color: var(--primary); border: 1px solid var(--primary); padding: 12px; width: 100%; font-family: 'Orbitron'; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.3s; border-radius: 6px; margin-bottom: 10px; }
         .btn-action:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); }
         
-        /* 1. AUDIO VISUALIZER */
-        #audioVisualizer { width: 100%; height: 40px; margin-top: 10px; }
+        /* AUDIO VISUALIZER */
+        #audioVisualizer { width: 100%; height: 30px; margin-top: 10px; }
 
-        /* 3 & 4. DRAGGABLE TERMINAL + INPUT */
+        /* DRAGGABLE TERMINAL */
         .floating-term {
             position: absolute; top: 20px; right: 20px; width: 300px; background: rgba(0,0,0,0.85); border: 1px solid #333;
             border-top: 20px solid #222; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 500;
             display: flex; flex-direction: column; overflow: hidden;
         }
         .term-header { position: absolute; top: -20px; left: 0; width: 100%; height: 20px; cursor: move; color: #888; font-family: 'Share Tech Mono'; font-size: 10px; padding-left: 10px; line-height: 20px; }
-        .term-content { height: 120px; padding: 10px; font-family: 'Share Tech Mono'; font-size: 10px; color: #0f0; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-end; }
+        .term-content { height: 100px; padding: 10px; font-family: 'Share Tech Mono'; font-size: 10px; color: #0f0; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-end; }
         .cmd-line { display: flex; padding: 5px; background: #050505; border-top: 1px solid #222; }
         .cmd-line span { color: #0f0; font-family: 'Share Tech Mono'; font-size: 10px; margin-right: 5px; }
         .cmd-input { background: transparent; border: none; color: #fff; font-family: 'Share Tech Mono'; font-size: 10px; outline: none; width: 100%; }
 
-        /* 10. FAKE BLUE SCREEN */
+        /* FAKE BLUE SCREEN */
         #bsod {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0000aa; z-index: 99999;
-            color: #fff; font-family: 'Share Tech Mono'; padding: 50px; flex-direction: column; justify-content: center;
+            color: #fff; font-family: 'Share Tech Mono'; padding: 30px; flex-direction: column; justify-content: center;
         }
-        .bsod-title { font-size: 40px; background: #fff; color: #0000aa; display: inline-block; padding: 0 10px; margin-bottom: 30px; font-weight: bold; }
+        .bsod-title { font-size: 30px; background: #fff; color: #0000aa; display: inline-block; padding: 0 10px; margin-bottom: 20px; font-weight: bold; }
 
         /* EMP FLASH & QUAKE */
         #empFlash { position: fixed; inset: 0; background: #fff; z-index: 9999; opacity: 0; pointer-events: none; }
         .quake-heavy { animation: heavyShake 0.1s infinite; }
-        @keyframes heavyShake { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-8px, 6px); } }
+        @keyframes heavyShake { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-6px, 5px); } }
 
         /* VIP MODAL */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-box { background: #050505; border: 2px solid #ffcc00; padding: 30px; width: 350px; text-align: center; border-radius: 8px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px;}
+        .modal-box { background: #050505; border: 2px solid #ffcc00; padding: 30px; width: 100%; max-width: 350px; text-align: center; border-radius: 8px; }
         .btn-wa { background: #25D366; color: #000; border: none; padding: 12px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; }
         
-        /* 7. TYPEWRITER EFFECT CLASSES */
+        /* TYPEWRITER EFFECT */
         .typewriter { overflow: hidden; white-space: nowrap; border-right: 2px solid var(--primary); animation: blinkCursor .75s step-end infinite; }
         @keyframes blinkCursor { from, to { border-color: transparent } 50% { border-color: var(--primary); } }
 
+        /* MOBILE OPTIMIZATION PATCH */
+        @media (max-width: 768px) {
+            .telemetry { top: 10px; left: 10px; font-size: 9px; }
+            .floating-term { position: relative; top: auto; right: auto; width: 100%; max-width: 380px; margin: 60px auto 20px auto; z-index: 5; }
+            .ui-center { flex-direction: column; justify-content: flex-start; padding-top: 10px; }
+            .cyber-card { padding: 25px 20px; margin-bottom: 30px;}
+            .title { font-size: 26px; }
+            .subtitle { font-size: 9px; }
+            .term-header { cursor: default; } /* Disable drag cursor on mobile */
+        }
     </style>
 </head>
 <body>
@@ -127,8 +137,8 @@
         <div class="bsod-title">SYSTEM_FATAL_ERROR</div>
         <p>A problem has been detected and OMNI-NEXUS has been shut down to prevent damage to your hardware.</p><br>
         <p>CORE_TEMPERATURE_DROP_CRITICAL_FAILURE</p><br>
-        <p>If this is the first time you've seen this Stop error screen, restart your terminal. If you are a weak hacker, give up.</p><br>
-        <p>*** STOP: 0x000000ED (0x80F128D0, 0xc000009c, 0x00000000, 0x00000000)</p><br>
+        <p>If this is the first time you've seen this Stop error screen, restart your terminal.</p><br>
+        <p>*** STOP: 0x000000ED (0x80F128D0, 0xc000009c, 0x00000000)</p><br>
         <p>Rebooting in <span id="bsodTimer">5</span> seconds...</p>
     </div>
 
@@ -144,19 +154,20 @@
         <p>LATENCY: <span id="pingVal">12ms</span></p>
     </div>
 
-    <div class="floating-term" id="dragTerm">
-        <div class="term-header" id="termHeader">SYS_LOG_CONSOLE (DRAG ME)</div>
-        <div class="term-content" id="termContent">
-            <div>> Initialization complete.</div>
-            <div>> Type /help for commands.</div>
-        </div>
-        <div class="cmd-line">
-            <span>root@nexus:~#</span>
-            <input type="text" class="cmd-input" id="cmdInput" autocomplete="off" spellcheck="false">
-        </div>
-    </div>
-
     <div class="ui-center">
+        
+        <div class="floating-term" id="dragTerm">
+            <div class="term-header" id="termHeader">SYS_LOG_CONSOLE (DRAG ME ON PC)</div>
+            <div class="term-content" id="termContent">
+                <div>> Initialization complete.</div>
+                <div>> Type /help for commands.</div>
+            </div>
+            <div class="cmd-line">
+                <span>root@nexus:~#</span>
+                <input type="text" class="cmd-input" id="cmdInput" autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+
         <div class="cyber-card" id="mainCard">
             <div class="title" id="twTitle">SENSI KR XIT</div>
             <div class="subtitle" id="twSub">OMNIVERSE DECRYPTION NODE</div>
@@ -170,10 +181,12 @@
             </div>
 
             <div class="brute-wrap">
-                <div class="ring-3d r1" id="ring1"></div>
-                <div class="ring-3d r2" id="ring2"></div>
-                <div class="brute-btn" id="bruteBtn">
-                    <div class="btn-text">TAP</div>
+                <div class="brute-center">
+                    <div class="ring-3d r1" id="ring1"></div>
+                    <div class="ring-3d r2" id="ring2"></div>
+                    <div class="brute-btn" id="bruteBtn">
+                        <div class="btn-text">TAP</div>
+                    </div>
                 </div>
             </div>
 
@@ -203,13 +216,12 @@
         // Global State
         let heat = 0; const maxHeat = 1000; let isHacked = false; let peakHeatReached = false;
         
-        // 9. DYNAMIC COLOR SHIFT
         function setRootColor(color) {
             document.documentElement.style.setProperty('--primary', color);
             document.getElementById('trail').style.background = color;
         }
 
-        // 2. DEVICE TELEMETRY (Battery API)
+        // DEVICE TELEMETRY
         const osVal = document.getElementById('osVal'); const battVal = document.getElementById('battVal');
         osVal.innerText = /Android/i.test(navigator.userAgent) ? "ANDROID_OS" : /iPhone|iPad/i.test(navigator.userAgent) ? "IOS_SECURE" : "DESKTOP_NODE";
         if (navigator.getBattery) {
@@ -220,7 +232,7 @@
         } else { battVal.innerText = "N/A (ENCRYPTED)"; }
         setInterval(() => { document.getElementById('pingVal').innerText = Math.floor(Math.random()*15+5) + "ms"; }, 2000);
 
-        // 13. CUSTOM CURSOR
+        // CUSTOM CURSOR
         const cursor = document.getElementById('cursor'); const trail = document.getElementById('trail');
         if(window.matchMedia("(pointer: coarse)").matches) { cursor.style.display="none"; trail.style.display="none"; document.body.style.cursor="auto"; }
         document.addEventListener('mousemove', e => {
@@ -228,18 +240,16 @@
             setTimeout(() => { trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; }, 40);
         });
 
-        // 3. DRAGGABLE TERMINAL
+        // DRAGGABLE TERMINAL (PC ONLY)
         const dragTerm = document.getElementById('dragTerm'); const termHeader = document.getElementById('termHeader');
         let isDragging = false, offsetX, offsetY;
-        termHeader.addEventListener('mousedown', e => { isDragging = true; offsetX = e.clientX - dragTerm.offsetLeft; offsetY = e.clientY - dragTerm.offsetTop; });
-        document.addEventListener('mousemove', e => { if(isDragging) { dragTerm.style.left = (e.clientX - offsetX) + 'px'; dragTerm.style.top = (e.clientY - offsetY) + 'px'; } });
-        document.addEventListener('mouseup', () => isDragging = false);
-        // Touch support for drag
-        termHeader.addEventListener('touchstart', e => { isDragging = true; offsetX = e.touches[0].clientX - dragTerm.offsetLeft; offsetY = e.touches[0].clientY - dragTerm.offsetTop; });
-        document.addEventListener('touchmove', e => { if(isDragging) { dragTerm.style.left = (e.touches[0].clientX - offsetX) + 'px'; dragTerm.style.top = (e.touches[0].clientY - offsetY) + 'px'; } });
-        document.addEventListener('touchend', () => isDragging = false);
+        if(!window.matchMedia("(max-width: 768px)").matches) {
+            termHeader.addEventListener('mousedown', e => { isDragging = true; offsetX = e.clientX - dragTerm.offsetLeft; offsetY = e.clientY - dragTerm.offsetTop; });
+            document.addEventListener('mousemove', e => { if(isDragging) { dragTerm.style.left = (e.clientX - offsetX) + 'px'; dragTerm.style.top = (e.clientY - offsetY) + 'px'; } });
+            document.addEventListener('mouseup', () => isDragging = false);
+        }
 
-        // 4. INTERACTIVE TERMINAL
+        // INTERACTIVE TERMINAL
         const termContent = document.getElementById('termContent'); const cmdInput = document.getElementById('cmdInput');
         function printTerm(txt, color="#0f0") {
             const div = document.createElement('div'); div.innerText = `> ${txt}`; div.style.color = color;
@@ -256,7 +266,6 @@
             }
         });
 
-        // 5. SECRET EASTER EGG (Konami Code Style: X-I-T)
         let keysPressed = '';
         window.addEventListener('keydown', e => {
             keysPressed += e.key.toLowerCase();
@@ -266,12 +275,12 @@
 
         function forceHack() { heat = 100; updateUI(); triggerBreach(); }
 
-        // 1 & 14. SPATIAL AUDIO & VISUALIZER
+        // SPATIAL AUDIO & VISUALIZER
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const analyser = audioCtx.createAnalyser(); analyser.fftSize = 64;
         const bufferLength = analyser.frequencyBinCount; const dataArray = new Uint8Array(bufferLength);
         const visCanvas = document.getElementById('audioVisualizer'); const visCtx = visCanvas.getContext('2d');
-        visCanvas.width = 320; visCanvas.height = 40;
+        visCanvas.width = 300; visCanvas.height = 30;
 
         function drawVisualizer() {
             requestAnimationFrame(drawVisualizer);
@@ -279,9 +288,9 @@
             visCtx.clearRect(0, 0, visCanvas.width, visCanvas.height);
             let barWidth = (visCanvas.width / bufferLength) * 2.5; let barHeight; let x = 0;
             for(let i=0; i<bufferLength; i++) {
-                barHeight = dataArray[i] / 2;
+                barHeight = dataArray[i] / 4;
                 visCtx.fillStyle = document.documentElement.style.getPropertyValue('--primary') || '#00e5ff';
-                visCtx.fillRect(x, visCanvas.height - barHeight + 5, barWidth, barHeight);
+                visCtx.fillRect(x, visCanvas.height - barHeight, barWidth, barHeight);
                 x += barWidth + 2;
             }
         }
@@ -300,13 +309,11 @@
         document.body.addEventListener('click', initAudio);
         document.body.addEventListener('touchstart', initAudio);
 
-        // Spatial Audio update based on mouse
         document.addEventListener('mousemove', e => {
             if(dronePan) { let pan = (e.clientX / window.innerWidth) * 2 - 1; dronePan.pan.value = pan; }
-            if(droneOsc && !isHacked) { droneOsc.frequency.value = 40 + (e.clientY / window.innerHeight) * 20; } // Pitch alters on Y
+            if(droneOsc && !isHacked) { droneOsc.frequency.value = 40 + (e.clientY / window.innerHeight) * 20; } 
         });
 
-        // 12. MULTILINGUAL AI VOICE
         function speakAI(text, lang='en-US') {
             if('speechSynthesis' in window) {
                 const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = 1.1; u.pitch = 0.6;
@@ -314,14 +321,14 @@
             }
         }
 
-        // 6. PHYSICS PARTICLE CANVAS (Repulsion)
+        // PHYSICS PARTICLE CANVAS
         const pCanvas = document.getElementById('particleCanvas'); const pCtx = pCanvas.getContext('2d');
         pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight;
         let particles = [];
         let mouse = { x: null, y: null, radius: 100 };
         document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
         
-        for(let i=0; i<150; i++) particles.push({ x: Math.random()*pCanvas.width, y: Math.random()*pCanvas.height, size: Math.random()*2+1, baseX: 0, baseY: 0, vx: Math.random()*2-1, vy: Math.random()*2-1 });
+        for(let i=0; i<150; i++) particles.push({ x: Math.random()*pCanvas.width, y: Math.random()*pCanvas.height, size: Math.random()*2+1, vx: Math.random()*2-1, vy: Math.random()*2-1 });
 
         function animateParticles() {
             pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
@@ -331,7 +338,6 @@
                 p.x += p.vx; p.y += p.vy;
                 if(p.x<0 || p.x>pCanvas.width) p.vx *= -1; if(p.y<0 || p.y>pCanvas.height) p.vy *= -1;
                 
-                // Repulsion
                 let dx = mouse.x - p.x; let dy = mouse.y - p.y; let dist = Math.sqrt(dx*dx + dy*dy);
                 if(dist < mouse.radius) { p.x -= dx/10; p.y -= dy/10; }
 
@@ -341,11 +347,16 @@
         }
         animateParticles();
 
-        // 7. TYPEWRITER BOOT
+        // TYPEWRITER BOOT (Fix Spaces)
         function typeWriter(el, text, speed) {
-            el.innerText = ''; el.classList.add('typewriter');
+            el.innerHTML = ''; el.classList.add('typewriter');
             let i = 0;
-            let iv = setInterval(() => { el.innerText += text.charAt(i); i++; if(i>=text.length) { clearInterval(iv); el.classList.remove('typewriter'); } }, speed);
+            let iv = setInterval(() => { 
+                let char = text.charAt(i);
+                el.innerHTML += char === ' ' ? '&nbsp;' : char; 
+                i++; 
+                if(i>=text.length) { clearInterval(iv); el.classList.remove('typewriter'); } 
+            }, speed);
         }
         window.onload = () => {
             typeWriter(document.getElementById('twTitle'), "SENSI KR XIT", 100);
@@ -360,7 +371,6 @@
             if(!isHacked && heat > 0) {
                 heat -= 0.8; if(heat < 0) heat = 0;
                 updateUI();
-                // 10. BSOD PENALTY
                 if(peakHeatReached && heat === 0 && !isHacked) {
                     document.getElementById('bsod').style.display = 'flex';
                     speakAI("System failure. Operator terminated.", "en-US");
@@ -375,13 +385,13 @@
             tempVal.innerText = `${currentTemp}°C`;
 
             if(heat > 80) {
-                peakHeatReached = true; setRootColor('#b000ff'); // Purple
+                peakHeatReached = true; setRootColor('#b000ff'); 
                 document.body.classList.add('quake-heavy');
             } else if(heat > 50) {
-                setRootColor('#ffcc00'); // Yellow
+                setRootColor('#ffcc00'); 
                 document.body.classList.remove('quake-heavy');
             } else {
-                setRootColor('#00e5ff'); // Cyan
+                setRootColor('#00e5ff'); 
                 document.body.classList.remove('quake-heavy');
             }
         }
@@ -397,12 +407,11 @@
             heat += 5; if(heat>=100) { heat=100; triggerBreach(); }
             updateUI();
             
-            // Tap sound
             const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(analyser); analyser.connect(audioCtx.destination);
             o.type = 'square'; o.frequency.value = 200 + (heat*5); g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.1);
             o.start(); o.stop(audioCtx.currentTime+0.1);
 
-            if(heat === 50) speakAI("警告、温度が上昇しています", "ja-JP"); // Japanese warning
+            if(heat === 50) speakAI("警告、温度が上昇しています", "ja-JP"); 
             if(heat === 85) speakAI("Critical. Overload imminent.", "en-US");
             if(Math.random()>0.7) printTerm(`Brute force attempt: Hash ${Math.floor(Math.random()*9999)}`);
         }
@@ -413,14 +422,13 @@
             document.getElementById('empFlash').style.transition = 'opacity 1.5s';
             setTimeout(()=> document.getElementById('empFlash').style.opacity = '0', 100);
             
-            setRootColor('#0f0'); // Green success
+            setRootColor('#0f0'); 
             printTerm("FIREWALL BREACHED. GENERATING TOKEN.", "#0f0");
-            speakAI("Взлом завершен. Доступ разрешен.", "ru-RU"); // Russian "Hack complete. Access granted."
+            speakAI("Взлом завершен. Доступ разрешен.", "ru-RU"); 
             
             const today = new Date(); const dStr = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,'0') + "-" + String(today.getDate()).padStart(2,'0');
             const k = btoa(dStr + "_XIT_SECRET_VIP");
             
-            // Matrix decode
             const ki = document.getElementById('keyDisplay'); ki.classList.remove('locked');
             let c=0; let iv=setInterval(()=>{ ki.value=k.split('').map((ch,i)=>i<c/(20/k.length)?k[i]:'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random()*26)]).join(''); c++; if(c>=20){clearInterval(iv);ki.value=k;} },50);
         }
