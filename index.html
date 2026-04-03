@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENSI KR XIT - ACCESS PORTAL</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container-3d {
+            background: linear-gradient(145deg, #1f1f1f, #1a1a1a);
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 350px;
+            box-shadow: 15px 15px 30px #080808, -15px -15px 30px #242424;
+            border: 1px solid #333;
+            text-align: center;
+            position: relative;
+        }
+        .container-3d::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #ff0033, #000000, #00ffff);
+            z-index: -1;
+            border-radius: 22px;
+            animation: borderGlow 4s linear infinite;
+        }
+        @keyframes borderGlow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        h2 {
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            color: #ffffff;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        p.subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 30px;
+            font-family: monospace;
+        }
+        .input-recessed {
+            background: #0d0d0d;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            color: #00ffff;
+            font-family: monospace;
+            font-size: 16px;
+            text-align: center;
+            box-shadow: inset 5px 5px 10px #050505, inset -5px -5px 10px #151515;
+            outline: none;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+        .btn-3d {
+            background: linear-gradient(to bottom, #ff3366, #cc0000);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #660000, 0 15px 20px rgba(0,0,0,0.4);
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        .btn-3d:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 #660000, 0 5px 10px rgba(0,0,0,0.4);
+        }
+        .btn-copy {
+            background: linear-gradient(to bottom, #33ff99, #00cc66);
+            box-shadow: 0 8px 0 #006633, 0 15px 20px rgba(0,0,0,0.4);
+        }
+        .btn-copy:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 #006633, 0 5px 10px rgba(0,0,0,0.4);
+        }
+        .status-text {
+            font-size: 11px;
+            color: #ffcc00;
+            margin-top: 20px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-3d">
+        <h2>VIP GENERATOR</h2>
+        <p class="subtitle">FREE 24H ACCESS PORTAL</p>
+
+        <input type="text" id="keyDisplay" class="input-recessed" value="PRESS GENERATE" readonly>
+
+        <button class="btn-3d" onclick="generateKey()">GENERATE DAILY KEY</button>
+        <button class="btn-3d btn-copy" onclick="copyKey()">COPY TO CLIPBOARD</button>
+
+        <div class="status-text" id="statusLog">SYSTEM READY</div>
+    </div>
+
+    <script>
+        function generateKey() {
+            // Algoritma: Mendapatkan tanggal hari ini (Format: YYYY-MM-DD)
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            
+            const dateString = yyyy + "-" + mm + "-" + dd;
+            
+            // Mencampur tanggal dengan kata sandi rahasia
+            const secretPhrase = dateString + "_XIT_SECRET_VIP";
+            
+            // Mengubahnya menjadi format Base64 agar terlihat seperti kunci acak
+            const generatedKey = btoa(secretPhrase);
+            
+            document.getElementById('keyDisplay').value = generatedKey;
+            document.getElementById('statusLog').innerText = "KEY GENERATED. EXPIRES AT 00:00.";
+            document.getElementById('statusLog').style.color = "#00ff00";
+        }
+
+        function copyKey() {
+            const keyInput = document.getElementById('keyDisplay');
+            if(keyInput.value === "PRESS GENERATE") {
+                document.getElementById('statusLog').innerText = "PLEASE GENERATE KEY FIRST.";
+                document.getElementById('statusLog').style.color = "#ff0033";
+                return;
+            }
+            keyInput.select();
+            keyInput.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            document.getElementById('statusLog').innerText = "KEY COPIED TO CLIPBOARD!";
+            document.getElementById('statusLog').style.color = "#00ffff";
+        }
+    </script>
+
+</body>
+</html>
