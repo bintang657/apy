@@ -3,168 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENSI KR XIT | GOD-MODE V19.1</title>
+    <title>SENSI KR XIT | OMEGA SINGULARITY</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Orbitron', sans-serif; cursor: none; }
 
-        :root { --primary: #00e5ff; --bg: #000205; --text: #fff; }
+        :root { --primary: #00e5ff; --bg: #000103; --text: #fff; --threat: #00ff00; }
 
-        body { background-color: var(--bg); color: var(--text); overflow: hidden; height: 100vh; width: 100vw; position: relative; }
+        body { background-color: var(--bg); color: var(--text); overflow: hidden; height: 100vh; width: 100vw; position: relative; perspective: 1000px; }
 
-        /* CUSTOM CURSOR & TRAIL */
-        .cursor { position: fixed; width: 24px; height: 24px; border: 2px solid var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 10000; display: flex; justify-content: center; align-items: center; transition: background 0.1s; }
-        .cursor::after { content: ''; width: 4px; height: 4px; background: var(--primary); border-radius: 50%; }
-        .trail { position: fixed; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; filter: blur(4px); transition: 0.1s linear; opacity: 0.5; }
+        /* CRT EFFECTS & TRANSITIONS */
+        .crt::before { content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none; }
+        .flicker { animation: crtFlicker 0.15s infinite; }
+        @keyframes crtFlicker { 0% { opacity: 0.95; } 100% { opacity: 1; } }
+        
+        .screen-wipe { position: fixed; inset: 0; background: #000; z-index: 999999; animation: wipeOut 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards; pointer-events: none; display: flex; justify-content: center; align-items: center; border-bottom: 5px solid var(--primary);}
+        @keyframes wipeOut { 0% { height: 100%; } 100% { height: 0%; border-width: 0;} }
 
-        /* HEXAGONAL FORCEFIELD */
-        .hex-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.05; pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='69.28203230275509' viewBox='0 0 40 69.28203230275509' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 17.32050807568877l-20 11.547005383792515L0 17.32050807568877 0 0l20 11.547005383792515L40 0zM0 51.96152422706632l20-11.547005383792515 20 11.547005383792515 0 17.32050807568877-20-11.547005383792515L0 69.28203230275509z' fill='%2300e5ff' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E");
-            animation: pulseHex 4s infinite alternate; }
-        @keyframes pulseHex { 0% { opacity: 0.02; } 100% { opacity: 0.1; } }
+        /* CUSTOM CURSOR */
+        .cursor { position: fixed; width: 30px; height: 30px; border: 1px dashed var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 10000; display: flex; justify-content: center; align-items: center; transition: background 0.1s, transform 0.1s; animation: spinCursor 4s linear infinite; }
+        .cursor::before { content: '+'; color: var(--primary); font-size: 14px; position: absolute; }
+        @keyframes spinCursor { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+        .trail { position: fixed; width: 8px; height: 8px; background: var(--primary); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; filter: blur(3px); transition: 0.1s linear; opacity: 0.6; }
 
-        /* PARTICLE CANVAS & RADAR */
-        #particleCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
-        .radar-scan { position: absolute; top: 50%; left: 50%; width: 150vw; height: 150vw; border-radius: 50%; transform: translate(-50%, -50%); background: conic-gradient(from 0deg, transparent 70%, rgba(255, 0, 85, 0.2) 100%); animation: radarSpin 6s linear infinite; z-index: -3; pointer-events: none; }
+        /* HEX RIPPLE */
+        .hex-ripple { position: absolute; width: 50px; height: 57px; background: transparent; border: 2px solid var(--primary); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); transform: translate(-50%, -50%) scale(0); opacity: 1; pointer-events: none; animation: hexRip 0.6s ease-out forwards; z-index: 9998; }
+        @keyframes hexRip { 100% { transform: translate(-50%, -50%) scale(3); opacity: 0; } }
+
+        /* BACKGROUNDS */
+        .hex-overlay { position: absolute; inset: 0; z-index: -1; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg width='40' height='69.28' viewBox='0 0 40 69.28' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 17.32l-20 11.54L0 17.32 0 0l20 11.54L40 0zM0 51.96l20-11.54 20 11.54 0 17.32-20-11.54L0 69.28z' fill='%2300e5ff' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E"); animation: pulseHex 4s infinite alternate; transition: filter 0.3s; }
+        #particleCanvas { position: absolute; inset: 0; z-index: -2; transition: filter 0.3s; }
+        .radar-scan { position: absolute; top: 50%; left: 50%; width: 150vw; height: 150vw; border-radius: 50%; transform: translate(-50%, -50%); background: conic-gradient(from 0deg, transparent 70%, rgba(255, 0, 85, 0.1) 100%); animation: radarSpin 5s linear infinite; z-index: -3; }
         @keyframes radarSpin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
-        /* TELEMETRY */
-        .telemetry { position: absolute; top: 15px; left: 20px; font-family: 'Share Tech Mono'; font-size: 11px; color: var(--primary); z-index: 10; text-shadow: 0 0 8px var(--primary); pointer-events: none;}
-        .telemetry p { margin-bottom: 4px; } .telemetry span { color: #fff; }
+        /* 4D TESSERACT */
+        .tesseract-container { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; perspective: 400px; z-index: -1; opacity: 0.4; }
+        .cube { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; animation: rotateCube 10s linear infinite; }
+        .cube div { position: absolute; width: 60px; height: 60px; border: 1px solid var(--primary); background: rgba(0, 229, 255, 0.05); box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.2); }
+        .front { transform: translateZ(30px); } .back { transform: rotateY(180deg) translateZ(30px); }
+        .right { transform: rotateY(90deg) translateZ(30px); } .left { transform: rotateY(-90deg) translateZ(30px); }
+        .top { transform: rotateX(90deg) translateZ(30px); } .bottom { transform: rotateX(-90deg) translateZ(30px); }
+        @keyframes rotateCube { 100% { transform: rotateX(360deg) rotateY(360deg); } }
+
+        /* TELEMETRY & GRAPHS */
+        .telemetry { position: absolute; top: 15px; left: 20px; font-family: 'Share Tech Mono'; font-size: 10px; color: var(--primary); z-index: 10; text-shadow: 0 0 5px var(--primary); pointer-events: none;}
+        .telemetry p { margin-bottom: 2px; } .telemetry span { color: #fff; }
+        .threat-level { color: var(--threat) !important; font-weight: bold; text-shadow: 0 0 8px var(--threat); }
+        
+        .net-graph { width: 120px; height: 30px; background: rgba(0,255,0,0.05); border: 1px solid rgba(0,255,0,0.2); margin-top: 5px; position: relative; }
+        #netCanvas { width: 100%; height: 100%; }
+
+        /* TERMINAL */
+        .floating-term { position: absolute; top: 15px; right: 20px; width: 280px; background: rgba(0,0,0,0.85); border: 1px solid #333; border-top: 15px solid #222; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 500; display: flex; flex-direction: column; overflow: hidden; }
+        .floating-term::before { content:''; position: absolute; inset:0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,0,0.05) 2px, rgba(0,255,0,0.05) 4px); pointer-events:none; z-index:-1;}
+        .term-header { position: absolute; top: -15px; left: 0; width: 100%; height: 15px; cursor: move; color: #888; font-family: 'Share Tech Mono'; font-size: 9px; padding-left: 10px; line-height: 15px; }
+        .term-content { height: 90px; padding: 8px; font-family: 'Share Tech Mono'; font-size: 9px; color: #0f0; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-end; }
+        .term-content::-webkit-scrollbar { width: 4px; } .term-content::-webkit-scrollbar-thumb { background: var(--primary); }
+        .cmd-line { display: flex; padding: 4px; background: #050505; border-top: 1px solid #222; }
+        .cmd-line span { color: #0f0; font-family: 'Share Tech Mono'; font-size: 9px; margin-right: 5px; }
+        .cmd-input { background: transparent; border: none; color: #fff; font-family: 'Share Tech Mono'; font-size: 9px; outline: none; width: 100%; }
 
         /* MAIN UI CARD */
-        .ui-center { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow-y: auto; padding: 20px; }
+        .ui-center { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; overflow-y: auto; padding: 20px; transform-style: preserve-3d;}
         .cyber-card {
-            background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 2px solid var(--primary); border-radius: 16px; padding: 30px; width: 100%; max-width: 380px; position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0, 229, 255, 0.1);
-            transition: border-color 0.3s, box-shadow 0.3s;
+            background: rgba(5, 5, 10, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--primary); border-radius: 12px; padding: 30px; width: 100%; max-width: 380px; position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0, 229, 255, 0.1);
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.1s;
         }
 
-        .title { font-size: 32px; font-weight: 900; text-align: center; letter-spacing: -1px; text-shadow: 0 0 15px var(--primary); white-space: pre-wrap; }
-        .subtitle { font-family: 'Share Tech Mono'; font-size: 11px; text-align: center; margin-bottom: 20px; color: #aaa; letter-spacing: 3px; white-space: pre-wrap;}
+        .title { font-size: 32px; font-weight: 900; text-align: center; letter-spacing: -1px; text-shadow: 0 0 15px var(--primary); }
+        .subtitle { font-family: 'Share Tech Mono'; font-size: 10px; text-align: center; margin-bottom: 20px; color: #aaa; letter-spacing: 3px; }
 
-        /* HEAT METER */
         .meter-container { margin-bottom: 20px; }
-        .meter-info { display: flex; justify-content: space-between; font-family: 'Share Tech Mono'; font-size: 12px; margin-bottom: 5px; }
-        .meter-info span { color: var(--primary); font-weight: bold; }
-        .meter-bar { width: 100%; height: 10px; background: #111; border: 1px solid #333; border-radius: 5px; overflow: hidden; }
+        .meter-info { display: flex; justify-content: space-between; font-family: 'Share Tech Mono'; font-size: 11px; margin-bottom: 5px; }
+        .meter-info span { color: var(--primary); font-weight: bold; text-shadow: 0 0 5px var(--primary); }
+        .meter-bar { width: 100%; height: 8px; background: #111; border: 1px solid #333; border-radius: 4px; overflow: hidden; }
         .meter-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s; box-shadow: 0 0 10px var(--primary); }
 
-        /* MULTI-LAYER 3D RINGS (BUG FIX) */
-        .brute-wrap { display: flex; justify-content: center; align-items: center; margin-bottom: 30px; margin-top: 20px; perspective: 600px; }
+        /* BRUTE RINGS & RETINA SCAN */
+        .brute-wrap { display: flex; justify-content: center; align-items: center; margin-bottom: 25px; margin-top: 15px; perspective: 600px; }
         .brute-center { position: relative; width: 100px; height: 100px; display: flex; justify-content: center; align-items: center; }
         
         .brute-btn {
-            width: 100px; height: 100px; border-radius: 50%; background: #0a0a0a; border: 3px solid var(--primary);
+            width: 90px; height: 90px; border-radius: 50%; background: #0a0a0a; border: 2px solid var(--primary);
             display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; z-index: 5;
             box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px var(--primary); transition: transform 0.05s;
         }
-        .brute-btn:active { transform: scale(0.9); }
-        .btn-text { font-size: 18px; font-weight: 900; color: #fff; }
+        .brute-btn:active { transform: scale(0.85); }
+        .btn-text { font-size: 16px; font-weight: 900; color: #fff; z-index: 6;}
         
+        .retina-scan { position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); width: 20px; height: 20px; border: 1px solid var(--primary); border-radius: 50%; opacity: 0; animation: retinaPulse 1s infinite; z-index: 4;}
+        @keyframes retinaPulse { 0% { width: 20px; height: 20px; opacity: 1; } 100% { width: 80px; height: 80px; opacity: 0; } }
+
         .ring-3d { position: absolute; top: 50%; left: 50%; border-radius: 50%; pointer-events: none; border: 2px dashed var(--primary); }
-        .r1 { width: 150px; height: 150px; margin-top: -75px; margin-left: -75px; transform: rotateX(60deg) rotateY(0deg); animation: spin3D 3s linear infinite; }
-        .r2 { width: 130px; height: 130px; margin-top: -65px; margin-left: -65px; border-style: dotted; transform: rotateX(0deg) rotateY(60deg); animation: spin3DRev 4s linear infinite; }
+        .r1 { width: 140px; height: 140px; margin-top: -70px; margin-left: -70px; transform: rotateX(60deg) rotateY(0deg); animation: spin3D 3s linear infinite; }
+        .r2 { width: 120px; height: 120px; margin-top: -60px; margin-left: -60px; border-style: dotted; transform: rotateX(0deg) rotateY(60deg); animation: spin3DRev 4s linear infinite; }
 
-        @keyframes spin3D { 100% { transform: rotateX(60deg) rotateY(360deg) rotateZ(360deg); } }
-        @keyframes spin3DRev { 100% { transform: rotateX(360deg) rotateY(60deg) rotateZ(-360deg); } }
-
-        /* KEY INPUT */
-        .key-input {
-            background: #000; border: 1px solid var(--primary); border-radius: 8px; padding: 15px; width: 100%;
-            color: #fff; font-family: 'Share Tech Mono'; font-size: 15px; text-align: center; letter-spacing: 3px; outline: none; margin-bottom: 20px;
-        }
-
-        .btn-action { background: rgba(0,229,255,0.05); color: var(--primary); border: 1px solid var(--primary); padding: 12px; width: 100%; font-family: 'Orbitron'; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.3s; border-radius: 6px; margin-bottom: 10px; }
-        .btn-action:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); }
+        .key-input { background: #000; border: 1px solid var(--primary); border-radius: 6px; padding: 15px; width: 100%; color: #fff; font-family: 'Share Tech Mono'; font-size: 14px; text-align: center; letter-spacing: 4px; outline: none; margin-bottom: 20px; box-shadow: inset 0 0 10px rgba(0,0,0,0.9);}
         
-        /* AUDIO VISUALIZER */
-        #audioVisualizer { width: 100%; height: 30px; margin-top: 10px; }
+        .btn-action { background: rgba(0,229,255,0.05); color: var(--primary); border: 1px solid var(--primary); padding: 14px; width: 100%; font-family: 'Orbitron'; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.3s; border-radius: 6px; margin-bottom: 10px; position: relative;}
+        .btn-action:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); animation: btnGlitch 0.2s infinite; }
+        @keyframes btnGlitch { 0%,100%{transform: translate(0);} 50%{transform: translate(-1px, 1px);} }
+        
+        #audioVisualizer { width: 100%; height: 25px; margin-top: 10px; }
 
-        /* DRAGGABLE TERMINAL */
-        .floating-term {
-            position: absolute; top: 20px; right: 20px; width: 300px; background: rgba(0,0,0,0.85); border: 1px solid #333;
-            border-top: 20px solid #222; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 500;
-            display: flex; flex-direction: column; overflow: hidden;
-        }
-        .term-header { position: absolute; top: -20px; left: 0; width: 100%; height: 20px; cursor: move; color: #888; font-family: 'Share Tech Mono'; font-size: 10px; padding-left: 10px; line-height: 20px; }
-        .term-content { height: 100px; padding: 10px; font-family: 'Share Tech Mono'; font-size: 10px; color: #0f0; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-end; }
-        .cmd-line { display: flex; padding: 5px; background: #050505; border-top: 1px solid #222; }
-        .cmd-line span { color: #0f0; font-family: 'Share Tech Mono'; font-size: 10px; margin-right: 5px; }
-        .cmd-input { background: transparent; border: none; color: #fff; font-family: 'Share Tech Mono'; font-size: 10px; outline: none; width: 100%; }
+        /* INACTIVITY LOCK SCREEN */
+        #lockScreen { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 999999; flex-direction: column; justify-content: center; align-items: center; color: var(--primary); font-family: 'Share Tech Mono'; }
+        .lock-text { font-size: 20px; letter-spacing: 5px; margin-bottom: 20px; animation: pulseHex 2s infinite; }
+        .swipe-hint { font-size: 10px; color: #888; }
 
-        /* FAKE BLUE SCREEN */
-        #bsod {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0000aa; z-index: 99999;
-            color: #fff; font-family: 'Share Tech Mono'; padding: 30px; flex-direction: column; justify-content: center;
-        }
-        .bsod-title { font-size: 30px; background: #fff; color: #0000aa; display: inline-block; padding: 0 10px; margin-bottom: 20px; font-weight: bold; }
+        /* FAKE BLUE SCREEN & ABSOLUTE ZERO */
+        #bsod { display: none; position: fixed; inset: 0; background: #0000aa; z-index: 99999; color: #fff; font-family: 'Share Tech Mono'; padding: 30px; flex-direction: column; justify-content: center; transition: background 1s; }
+        .bsod-title { font-size: 24px; background: #fff; color: #0000aa; display: inline-block; padding: 0 10px; margin-bottom: 20px; font-weight: bold; }
 
-        /* EMP FLASH & QUAKE */
         #empFlash { position: fixed; inset: 0; background: #fff; z-index: 9999; opacity: 0; pointer-events: none; }
         .quake-heavy { animation: heavyShake 0.1s infinite; }
         @keyframes heavyShake { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-6px, 5px); } }
 
-        /* VIP MODAL */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px;}
-        .modal-box { background: #050505; border: 2px solid #ffcc00; padding: 30px; width: 100%; max-width: 350px; text-align: center; border-radius: 8px; }
+        .modal-box { background: #050505; border: 1px solid #ffcc00; padding: 25px; width: 100%; max-width: 350px; text-align: center; border-radius: 8px; }
         .btn-wa { background: #25D366; color: #000; border: none; padding: 12px; width: 100%; margin-bottom: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        
-        /* TYPEWRITER EFFECT */
-        .typewriter { overflow: hidden; white-space: nowrap; border-right: 2px solid var(--primary); animation: blinkCursor .75s step-end infinite; }
-        @keyframes blinkCursor { from, to { border-color: transparent } 50% { border-color: var(--primary); } }
 
-        /* MOBILE OPTIMIZATION PATCH */
+        /* RGB MODE */
+        body.rgb-mode { animation: rgbBg 5s linear infinite; }
+        body.rgb-mode * { --primary: #fff; border-color: inherit; }
+        @keyframes rgbBg { 0%{filter: hue-rotate(0deg);} 100%{filter: hue-rotate(360deg);} }
+
         @media (max-width: 768px) {
-            .telemetry { top: 10px; left: 10px; font-size: 9px; }
-            .floating-term { position: relative; top: auto; right: auto; width: 100%; max-width: 380px; margin: 60px auto 20px auto; z-index: 5; }
+            .telemetry { top: 10px; left: 10px; font-size: 8px; }
+            .floating-term { position: relative; top: auto; right: auto; width: 100%; max-width: 380px; margin: 40px auto 15px auto; z-index: 5; }
             .ui-center { flex-direction: column; justify-content: flex-start; padding-top: 10px; }
-            .cyber-card { padding: 25px 20px; margin-bottom: 30px;}
-            .title { font-size: 26px; }
-            .subtitle { font-size: 9px; }
-            .term-header { cursor: default; } /* Disable drag cursor on mobile */
+            .cyber-card { padding: 20px 15px; margin-bottom: 30px;}
+            .title { font-size: 24px; } .subtitle { font-size: 9px; }
+            .term-header { cursor: default; }
+            .tesseract-container { display: none; } /* Hide on mobile to save space */
         }
     </style>
 </head>
-<body>
+<body class="crt flicker">
 
-    <div class="cursor" id="cursor"></div>
-    <div class="trail" id="trail"></div>
+    <div class="screen-wipe"></div>
 
-    <div id="bsod">
-        <div class="bsod-title">SYSTEM_FATAL_ERROR</div>
-        <p>A problem has been detected and OMNI-NEXUS has been shut down to prevent damage to your hardware.</p><br>
-        <p>CORE_TEMPERATURE_DROP_CRITICAL_FAILURE</p><br>
-        <p>If this is the first time you've seen this Stop error screen, restart your terminal.</p><br>
-        <p>*** STOP: 0x000000ED (0x80F128D0, 0xc000009c, 0x00000000)</p><br>
-        <p>Rebooting in <span id="bsodTimer">5</span> seconds...</p>
+    <div id="lockScreen" onclick="unlockSystem()">
+        <div class="lock-text">SYSTEM IN STANDBY</div>
+        <div class="swipe-hint">TAP TO WAKE</div>
     </div>
 
+    <div class="cursor" id="cursor"></div><div class="trail" id="trail"></div>
+    <div id="bsod"><div class="bsod-title">SYSTEM_FATAL_ERROR</div><p>CORE_TEMPERATURE_DROP_CRITICAL_FAILURE</p><br><p>Rebooting in <span id="bsodTimer">5</span>s...</p></div>
     <div id="empFlash"></div>
 
     <canvas id="particleCanvas"></canvas>
     <div class="hex-overlay"></div>
     <div class="radar-scan"></div>
 
-    <div class="telemetry">
-        <p>OP_SYS : <span id="osVal">UNKNOWN</span></p>
-        <p>POWER  : <span id="battVal">SCANNING...</span></p>
-        <p>LATENCY: <span id="pingVal">12ms</span></p>
+    <div class="tesseract-container">
+        <div class="cube">
+            <div class="front"></div><div class="back"></div><div class="right"></div><div class="left"></div><div class="top"></div><div class="bottom"></div>
+        </div>
     </div>
 
-    <div class="ui-center">
-        
+    <div class="telemetry">
+        <p>IP_v6  : <span id="ipVal">2001:0db8::ff00:42:8329</span></p>
+        <p>MAC_ADR: <span id="macVal">00:1B:44:11:3A:B7</span></p>
+        <p>GPS_LAT: <span id="gpsLat">-6.2088</span></p>
+        <p>GPS_LNG: <span id="gpsLng">106.8456</span></p>
+        <p>CPU_LD : <span id="cpuVal">12%</span></p>
+        <p>RAM_ALC: <span id="ramVal">1024MB</span></p>
+        <p>BATT_LV: <span id="battVal">SCANNING...</span> (<span id="voltVal">3.8V</span>)</p>
+        <p>DEFCON : <span id="threatVal" class="threat-level">5</span></p>
+        <p>UPTIME : <span id="upVal">00:00:00:000</span></p>
+        <div class="net-graph"><canvas id="netCanvas"></canvas></div>
+    </div>
+
+    <div class="ui-center" id="uiCenter">
         <div class="floating-term" id="dragTerm">
-            <div class="term-header" id="termHeader">SYS_LOG_CONSOLE (DRAG ME ON PC)</div>
+            <div class="term-header" id="termHeader">SYS_LOG_CONSOLE</div>
             <div class="term-content" id="termContent">
                 <div>> Initialization complete.</div>
                 <div>> Type /help for commands.</div>
             </div>
             <div class="cmd-line">
-                <span>root@nexus:~#</span>
-                <input type="text" class="cmd-input" id="cmdInput" autocomplete="off" spellcheck="false">
+                <span>~#</span><input type="text" class="cmd-input" id="cmdInput" autocomplete="off" spellcheck="false">
             </div>
         </div>
 
@@ -173,10 +195,7 @@
             <div class="subtitle" id="twSub">OMNIVERSE DECRYPTION NODE</div>
 
             <div class="meter-container">
-                <div class="meter-info">
-                    <span>CORE HEAT</span>
-                    <span id="tempVal">0°C</span>
-                </div>
+                <div class="meter-info"><span>CORE HEAT</span><span id="tempVal">0°C</span></div>
                 <div class="meter-bar"><div class="meter-fill" id="heatFill"></div></div>
             </div>
 
@@ -185,6 +204,7 @@
                     <div class="ring-3d r1" id="ring1"></div>
                     <div class="ring-3d r2" id="ring2"></div>
                     <div class="brute-btn" id="bruteBtn">
+                        <div class="retina-scan"></div>
                         <div class="btn-text">TAP</div>
                     </div>
                 </div>
@@ -192,8 +212,8 @@
 
             <input type="text" id="keyDisplay" class="key-input locked" value="LOCKED" readonly>
 
-            <button class="btn-action" onclick="copyKey()">COPY SIGNATURE</button>
-            <button class="btn-action" style="border-color:#ffcc00; color:#ffcc00;" onclick="document.getElementById('vipModal').style.display='flex'">LIFETIME CLEARANCE (VIP)</button>
+            <button class="btn-action magnet-btn" onclick="copyKey()">COPY SIGNATURE</button>
+            <button class="btn-action magnet-btn" style="border-color:#ffcc00; color:#ffcc00;" onclick="document.getElementById('vipModal').style.display='flex'">LIFETIME CLEARANCE (VIP)</button>
 
             <canvas id="audioVisualizer"></canvas>
         </div>
@@ -201,9 +221,10 @@
 
     <div class="modal" id="vipModal">
         <div class="modal-box">
-            <h2 style="color:#ffcc00; margin-bottom:20px; font-weight:900;">LIFETIME VIP</h2>
-            <button class="btn-wa" onclick="window.location.href='https://wa.me/+6281225980437'">SYS ADMIN 1</button>
-            <button class="btn-wa" onclick="window.location.href='https://wa.me/+6285798209865'">SYS ADMIN 2</button>
+            <h2 style="color:#ffcc00; margin-bottom:15px; font-weight:900;">LIFETIME VIP</h2>
+            <div id="vipSim" style="font-family:'Share Tech Mono'; font-size:10px; color:#0f0; margin-bottom:15px; text-align:left;">> Waiting for selection...</div>
+            <button class="btn-wa" onclick="simVip('https://wa.me/+6281225980437')">SYS ADMIN 1</button>
+            <button class="btn-wa" onclick="simVip('https://wa.me/+6285798209865')">SYS ADMIN 2</button>
             <button class="btn-action" onclick="document.getElementById('vipModal').style.display='none'">CLOSE</button>
         </div>
     </div>
@@ -213,34 +234,86 @@
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.onkeydown = e => { if(e.keyCode==123 || (e.ctrlKey && e.shiftKey && [73,67,74].includes(e.keyCode)) || (e.ctrlKey && e.keyCode==85)) return false; }
 
-        // Global State
-        let heat = 0; const maxHeat = 1000; let isHacked = false; let peakHeatReached = false;
+        let heat = 0; const maxHeat = 1000; let isHacked = false; let peakHeatReached = false; let idleTime = 0;
         
         function setRootColor(color) {
             document.documentElement.style.setProperty('--primary', color);
             document.getElementById('trail').style.background = color;
         }
 
-        // DEVICE TELEMETRY
-        const osVal = document.getElementById('osVal'); const battVal = document.getElementById('battVal');
-        osVal.innerText = /Android/i.test(navigator.userAgent) ? "ANDROID_OS" : /iPhone|iPad/i.test(navigator.userAgent) ? "IOS_SECURE" : "DESKTOP_NODE";
-        if (navigator.getBattery) {
-            navigator.getBattery().then(b => {
-                battVal.innerText = Math.floor(b.level * 100) + "% " + (b.charging ? "(CHARGING)" : "");
-                b.addEventListener('levelchange', () => battVal.innerText = Math.floor(b.level * 100) + "%");
-            });
-        } else { battVal.innerText = "N/A (ENCRYPTED)"; }
-        setInterval(() => { document.getElementById('pingVal').innerText = Math.floor(Math.random()*15+5) + "ms"; }, 2000);
+        // TELEMETRY UPDATES
+        if (navigator.getBattery) navigator.getBattery().then(b => { 
+            const u = () => { document.getElementById('battVal').innerText = Math.floor(b.level * 100) + "%"; document.getElementById('voltVal').innerText = (3.5 + b.level*0.7).toFixed(2)+"V"; };
+            u(); b.addEventListener('levelchange', u); 
+        });
+        
+        let startT = Date.now();
+        setInterval(() => {
+            // Fake IP & MAC Spoofer
+            if(Math.random()>0.8) {
+                document.getElementById('ipVal').innerText = `2001:0db8::${Math.floor(Math.random()*9999)}:${Math.floor(Math.random()*9999)}`;
+                document.getElementById('macVal').innerText = `00:1B:44:${Math.floor(Math.random()*90+10)}:${Math.floor(Math.random()*90+10)}:B7`;
+            }
+            // Fake GPS
+            document.getElementById('gpsLat').innerText = (-6.2000 + (Math.random()-0.5)*0.01).toFixed(4);
+            document.getElementById('gpsLng').innerText = (106.8400 + (Math.random()-0.5)*0.01).toFixed(4);
+            // CPU & RAM
+            document.getElementById('cpuVal').innerText = Math.floor(Math.random()*80+10) + "%";
+            document.getElementById('ramVal').innerText = Math.floor(Math.random()*4000+1024) + "MB";
+            
+            // Uptime Milliseconds
+            let diff = Date.now() - startT;
+            let h = Math.floor(diff/3600000).toString().padStart(2,'0');
+            let m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
+            let s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+            let ms = (diff%1000).toString().padStart(3,'0');
+            document.getElementById('upVal').innerText = `${h}:${m}:${s}:${ms}`;
+            
+            // Idle Lock
+            idleTime += 0.05;
+            if(idleTime > 15 && !isHacked && document.getElementById('lockScreen').style.display !== 'flex') {
+                document.getElementById('lockScreen').style.display = 'flex';
+                speakAI("System entering sleep mode.", "en-US");
+            }
+        }, 50);
 
-        // CUSTOM CURSOR
+        // Network Graph
+        const nc = document.getElementById('netCanvas'); const nctx = nc.getContext('2d');
+        nc.width = 120; nc.height = 30; let netData = new Array(120).fill(30);
+        setInterval(() => {
+            nctx.clearRect(0,0,120,30);
+            netData.push(30 - Math.random()*25); netData.shift();
+            nctx.beginPath(); nctx.strokeStyle = '#0f0';
+            for(let i=0; i<120; i++) i===0 ? nctx.moveTo(i, netData[i]) : nctx.lineTo(i, netData[i]);
+            nctx.stroke();
+        }, 100);
+
+        // RESET IDLE
+        document.addEventListener('mousemove', ()=>idleTime=0); document.addEventListener('keypress', ()=>idleTime=0); document.addEventListener('touchstart', ()=>idleTime=0);
+        function unlockSystem() { document.getElementById('lockScreen').style.display='none'; idleTime=0; initAudio(); speakAI("System active.", "en-US"); }
+
+        // CURSOR & HEX RIPPLE
         const cursor = document.getElementById('cursor'); const trail = document.getElementById('trail');
-        if(window.matchMedia("(pointer: coarse)").matches) { cursor.style.display="none"; trail.style.display="none"; document.body.style.cursor="auto"; }
+        if(window.matchMedia("(pointer: coarse)").matches) { cursor.style.display="none"; trail.style.display="none"; }
         document.addEventListener('mousemove', e => {
             cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
             setTimeout(() => { trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; }, 40);
         });
+        document.addEventListener('click', e => {
+            const rip = document.createElement('div'); rip.className = 'hex-ripple';
+            rip.style.left = e.clientX + 'px'; rip.style.top = e.clientY + 'px';
+            document.body.appendChild(rip); setTimeout(()=>rip.remove(), 600);
+        });
 
-        // DRAGGABLE TERMINAL (PC ONLY)
+        // GYROSCOPE PARALLAX
+        if(window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', e => {
+                let x = e.gamma ? e.gamma / 2 : 0; let y = e.beta ? e.beta / 2 : 0;
+                document.getElementById('uiCenter').style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+            });
+        }
+
+        // DRAGGABLE TERMINAL
         const dragTerm = document.getElementById('dragTerm'); const termHeader = document.getElementById('termHeader');
         let isDragging = false, offsetX, offsetY;
         if(!window.matchMedia("(max-width: 768px)").matches) {
@@ -249,52 +322,56 @@
             document.addEventListener('mouseup', () => isDragging = false);
         }
 
-        // INTERACTIVE TERMINAL
+        // TERMINAL HISTORY
         const termContent = document.getElementById('termContent'); const cmdInput = document.getElementById('cmdInput');
+        let cmdHist = []; let histIdx = -1;
         function printTerm(txt, color="#0f0") {
             const div = document.createElement('div'); div.innerText = `> ${txt}`; div.style.color = color;
             termContent.appendChild(div); termContent.scrollTop = termContent.scrollHeight;
         }
-        cmdInput.addEventListener('keypress', e => {
+        cmdInput.addEventListener('keydown', e => {
             if(e.key === 'Enter') {
                 const val = cmdInput.value.trim().toLowerCase(); printTerm(cmdInput.value, "#fff"); cmdInput.value = "";
-                if(val === '/help') { printTerm("/vip - Get Access"); printTerm("/clear - Clear logs"); printTerm("/hack - Auto breach"); }
+                if(val) { cmdHist.push(val); histIdx = cmdHist.length; }
+                if(val === '/help') { printTerm("/vip, /clear, /hack, /rgb"); }
                 else if(val === '/clear') termContent.innerHTML = '';
                 else if(val === '/vip') document.getElementById('vipModal').style.display='flex';
+                else if(val === '/rgb') document.body.classList.toggle('rgb-mode');
                 else if(val === '/hack' && !isHacked) forceHack();
-                else printTerm(`Command not found: ${val}`, "red");
+                else printTerm(`ERR_CMD: ${val}`, "red");
+            } else if(e.key === 'ArrowUp') {
+                if(histIdx > 0) { histIdx--; cmdInput.value = cmdHist[histIdx]; }
+            } else if(e.key === 'ArrowDown') {
+                if(histIdx < cmdHist.length-1) { histIdx++; cmdInput.value = cmdHist[histIdx]; }
+                else { histIdx = cmdHist.length; cmdInput.value = ""; }
             }
         });
 
+        // EASTER EGG XIT
         let keysPressed = '';
         window.addEventListener('keydown', e => {
             keysPressed += e.key.toLowerCase();
-            if(keysPressed.includes('xit') && !isHacked) { printTerm("EASTER EGG TRIGGERED. ROOT ACCESS GRANTED.", "yellow"); forceHack(); keysPressed=''; }
+            if(keysPressed.includes('xit') && !isHacked) { printTerm("EASTER EGG TRIGGERED", "yellow"); forceHack(); keysPressed=''; }
             if(keysPressed.length > 5) keysPressed = keysPressed.slice(-5);
         });
 
         function forceHack() { heat = 100; updateUI(); triggerBreach(); }
 
-        // SPATIAL AUDIO & VISUALIZER
+        // AUDIO & VISUALIZER
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const analyser = audioCtx.createAnalyser(); analyser.fftSize = 64;
-        const bufferLength = analyser.frequencyBinCount; const dataArray = new Uint8Array(bufferLength);
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
         const visCanvas = document.getElementById('audioVisualizer'); const visCtx = visCanvas.getContext('2d');
-        visCanvas.width = 300; visCanvas.height = 30;
+        visCanvas.width = 300; visCanvas.height = 25;
 
-        function drawVisualizer() {
-            requestAnimationFrame(drawVisualizer);
-            analyser.getByteFrequencyData(dataArray);
-            visCtx.clearRect(0, 0, visCanvas.width, visCanvas.height);
-            let barWidth = (visCanvas.width / bufferLength) * 2.5; let barHeight; let x = 0;
-            for(let i=0; i<bufferLength; i++) {
-                barHeight = dataArray[i] / 4;
-                visCtx.fillStyle = document.documentElement.style.getPropertyValue('--primary') || '#00e5ff';
-                visCtx.fillRect(x, visCanvas.height - barHeight, barWidth, barHeight);
-                x += barWidth + 2;
+        function drawVis() {
+            requestAnimationFrame(drawVis); analyser.getByteFrequencyData(dataArray); visCtx.clearRect(0,0,300,25);
+            let bw = (300/32)*2.5; let x=0;
+            for(let i=0; i<32; i++) {
+                let bh = dataArray[i]/4; visCtx.fillStyle = document.documentElement.style.getPropertyValue('--primary') || '#00e5ff';
+                visCtx.fillRect(x, 25-bh, bw, bh); x+=bw+2;
             }
-        }
-        drawVisualizer();
+        } drawVis();
 
         let droneOsc, dronePan;
         function initAudio() {
@@ -305,30 +382,30 @@
             const gain = audioCtx.createGain(); gain.gain.value = 0.05;
             droneOsc.connect(dronePan); dronePan.connect(gain); gain.connect(analyser); analyser.connect(audioCtx.destination);
             droneOsc.start();
+            
+            // Random Ambient Chatter
+            setInterval(()=>{
+                if(Math.random()>0.7 && !isHacked) {
+                    const no = audioCtx.createOscillator(); no.type = 'square'; no.frequency.value = 1000+Math.random()*2000;
+                    const ng = audioCtx.createGain(); no.connect(ng); ng.connect(audioCtx.destination);
+                    ng.gain.setValueAtTime(0.01, audioCtx.currentTime); ng.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.1);
+                    no.start(); no.stop(audioCtx.currentTime+0.1);
+                }
+            }, 2000);
         }
-        document.body.addEventListener('click', initAudio);
-        document.body.addEventListener('touchstart', initAudio);
-
-        document.addEventListener('mousemove', e => {
-            if(dronePan) { let pan = (e.clientX / window.innerWidth) * 2 - 1; dronePan.pan.value = pan; }
-            if(droneOsc && !isHacked) { droneOsc.frequency.value = 40 + (e.clientY / window.innerHeight) * 20; } 
-        });
 
         function speakAI(text, lang='en-US') {
             if('speechSynthesis' in window) {
-                const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = 1.1; u.pitch = 0.6;
+                const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = 1.1; u.pitch = 0.5;
                 window.speechSynthesis.speak(u);
             }
         }
 
-        // PHYSICS PARTICLE CANVAS
+        // PARTICLES
         const pCanvas = document.getElementById('particleCanvas'); const pCtx = pCanvas.getContext('2d');
         pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight;
         let particles = [];
-        let mouse = { x: null, y: null, radius: 100 };
-        document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-        
-        for(let i=0; i<150; i++) particles.push({ x: Math.random()*pCanvas.width, y: Math.random()*pCanvas.height, size: Math.random()*2+1, vx: Math.random()*2-1, vy: Math.random()*2-1 });
+        for(let i=0; i<150; i++) particles.push({ x: Math.random()*pCanvas.width, y: Math.random()*pCanvas.height, size: Math.random()*2+1, vx: Math.random()*2-1, vy: Math.random()*2-1, morse: Math.random()>0.9 });
 
         function animateParticles() {
             pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
@@ -338,93 +415,81 @@
                 p.x += p.vx; p.y += p.vy;
                 if(p.x<0 || p.x>pCanvas.width) p.vx *= -1; if(p.y<0 || p.y>pCanvas.height) p.vy *= -1;
                 
-                let dx = mouse.x - p.x; let dy = mouse.y - p.y; let dist = Math.sqrt(dx*dx + dy*dy);
-                if(dist < mouse.radius) { p.x -= dx/10; p.y -= dy/10; }
-
-                pCtx.beginPath(); pCtx.arc(p.x, p.y, p.size, 0, Math.PI*2); pCtx.fill();
+                let alpha = 1;
+                if(p.morse) alpha = Math.random() > 0.8 ? 1 : 0.2; // Morse flashing
+                pCtx.globalAlpha = alpha;
+                pCtx.beginPath(); pCtx.arc(p.x, p.y, p.size, 0, Math.PI*2); pCtx.fill(); pCtx.globalAlpha = 1;
             });
             requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
+        } animateParticles();
 
-        // TYPEWRITER BOOT (Fix Spaces)
+        // TYPEWRITER
         function typeWriter(el, text, speed) {
-            el.innerHTML = ''; el.classList.add('typewriter');
-            let i = 0;
-            let iv = setInterval(() => { 
-                let char = text.charAt(i);
-                el.innerHTML += char === ' ' ? '&nbsp;' : char; 
-                i++; 
-                if(i>=text.length) { clearInterval(iv); el.classList.remove('typewriter'); } 
-            }, speed);
+            el.innerHTML = ''; el.classList.add('typewriter'); let i = 0;
+            let iv = setInterval(() => { el.innerHTML += text.charAt(i)===' '?'&nbsp;':text.charAt(i); i++; if(i>=text.length) { clearInterval(iv); el.classList.remove('typewriter'); } }, speed);
         }
-        window.onload = () => {
-            typeWriter(document.getElementById('twTitle'), "SENSI KR XIT", 100);
-            setTimeout(() => typeWriter(document.getElementById('twSub'), "OMNIVERSE DECRYPTION NODE", 50), 1500);
-        };
+        window.onload = () => { setTimeout(()=>{ typeWriter(document.getElementById('twTitle'), "SENSI KR XIT", 100); setTimeout(() => typeWriter(document.getElementById('twSub'), "OMNIVERSE DECRYPTION NODE", 50), 1200); }, 1500); };
 
         // BRUTE FORCE LOGIC
-        const bruteBtn = document.getElementById('bruteBtn'); const heatFill = document.getElementById('heatFill');
-        const tempVal = document.getElementById('tempVal');
+        const bruteBtn = document.getElementById('bruteBtn'); const heatFill = document.getElementById('heatFill'); const tempVal = document.getElementById('tempVal');
         
         setInterval(() => {
             if(!isHacked && heat > 0) {
-                heat -= 0.8; if(heat < 0) heat = 0;
+                heat -= 1.0; if(heat < 0) heat = 0;
                 updateUI();
                 if(peakHeatReached && heat === 0 && !isHacked) {
+                    // Absolute zero & BSOD
+                    document.getElementById('bsod').style.background = '#00e5ff'; // Ice blue first
+                    setTimeout(()=>document.getElementById('bsod').style.background = '#0000aa', 500);
                     document.getElementById('bsod').style.display = 'flex';
-                    speakAI("System failure. Operator terminated.", "en-US");
+                    speakAI("Core frozen. Operator terminated.", "en-US");
                     let cd = 5; let bsodIv = setInterval(() => { cd--; document.getElementById('bsodTimer').innerText = cd; if(cd<=0){ clearInterval(bsodIv); document.getElementById('bsod').style.display='none'; peakHeatReached=false; } }, 1000);
                 }
             }
         }, 50);
 
         function updateUI() {
-            heatFill.style.width = `${heat}%`;
-            let currentTemp = Math.floor((heat/100) * maxHeat);
-            tempVal.innerText = `${currentTemp}°C`;
-
+            heatFill.style.width = `${heat}%`; let currentTemp = Math.floor((heat/100) * maxHeat); tempVal.innerText = `${currentTemp}°C`;
+            let tl = document.getElementById('threatVal');
+            
             if(heat > 80) {
-                peakHeatReached = true; setRootColor('#b000ff'); 
-                document.body.classList.add('quake-heavy');
+                peakHeatReached = true; setRootColor('#ff0055'); tl.innerText = "1"; document.documentElement.style.setProperty('--threat', '#ff0055');
+                document.body.classList.add('quake-heavy'); document.getElementById('particleCanvas').style.filter = "blur(8px)";
             } else if(heat > 50) {
-                setRootColor('#ffcc00'); 
-                document.body.classList.remove('quake-heavy');
+                setRootColor('#ffcc00'); tl.innerText = "3"; document.documentElement.style.setProperty('--threat', '#ffcc00');
+                document.body.classList.remove('quake-heavy'); document.getElementById('particleCanvas').style.filter = "blur(4px)";
             } else {
-                setRootColor('#00e5ff'); 
-                document.body.classList.remove('quake-heavy');
+                setRootColor('#00e5ff'); tl.innerText = "5"; document.documentElement.style.setProperty('--threat', '#00ff00');
+                document.body.classList.remove('quake-heavy'); document.getElementById('particleCanvas').style.filter = "blur(0px)";
+                if(peakHeatReached && Math.random()>0.95 && heat<40) speakAI("Decryption failing", "en-US");
             }
         }
 
-        bruteBtn.addEventListener('mousedown', tapCore);
-        bruteBtn.addEventListener('touchstart', tapCore);
+        bruteBtn.addEventListener('mousedown', tapCore); bruteBtn.addEventListener('touchstart', tapCore);
 
         function tapCore(e) {
             if(e.type==='touchstart') e.preventDefault();
-            if(isHacked) return;
-            initAudio();
+            if(isHacked) return; initAudio(); idleTime = 0;
             
-            heat += 5; if(heat>=100) { heat=100; triggerBreach(); }
+            heat += 6; if(heat>=100) { heat=100; triggerBreach(); }
             updateUI();
             
             const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(analyser); analyser.connect(audioCtx.destination);
             o.type = 'square'; o.frequency.value = 200 + (heat*5); g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.1);
             o.start(); o.stop(audioCtx.currentTime+0.1);
 
-            if(heat === 50) speakAI("警告、温度が上昇しています", "ja-JP"); 
-            if(heat === 85) speakAI("Critical. Overload imminent.", "en-US");
-            if(Math.random()>0.7) printTerm(`Brute force attempt: Hash ${Math.floor(Math.random()*9999)}`);
+            if(heat === 50) speakAI("警告", "ja-JP"); 
+            if(heat === 85) speakAI("Critical", "en-US");
+            if(Math.random()>0.7) printTerm(`Brute force: ${Math.floor(Math.random()*9999)}`);
         }
 
         function triggerBreach() {
             isHacked = true; document.body.classList.remove('quake-heavy');
-            document.getElementById('empFlash').style.opacity = '1';
-            document.getElementById('empFlash').style.transition = 'opacity 1.5s';
+            document.getElementById('empFlash').style.opacity = '1'; document.getElementById('empFlash').style.transition = 'opacity 1.5s';
             setTimeout(()=> document.getElementById('empFlash').style.opacity = '0', 100);
             
-            setRootColor('#0f0'); 
-            printTerm("FIREWALL BREACHED. GENERATING TOKEN.", "#0f0");
-            speakAI("Взлом завершен. Доступ разрешен.", "ru-RU"); 
+            setRootColor('#0f0'); printTerm("BREACHED. GENERATING TOKEN.", "#0f0");
+            speakAI("Взлом завершен", "ru-RU"); 
             
             const today = new Date(); const dStr = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,'0') + "-" + String(today.getDate()).padStart(2,'0');
             const k = btoa(dStr + "_XIT_SECRET_VIP");
@@ -433,11 +498,8 @@
             let c=0; let iv=setInterval(()=>{ ki.value=k.split('').map((ch,i)=>i<c/(20/k.length)?k[i]:'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random()*26)]).join(''); c++; if(c>=20){clearInterval(iv);ki.value=k;} },50);
         }
 
-        function copyKey() {
-            const ki = document.getElementById('keyDisplay');
-            if(ki.classList.contains('locked')) { printTerm("ERR: NO KEY", "red"); return; }
-            ki.select(); document.execCommand("copy"); printTerm("COPIED TO CLIPBOARD", "yellow");
-        }
+        function copyKey() { const ki = document.getElementById('keyDisplay'); if(ki.classList.contains('locked')) { printTerm("ERR: NO KEY", "red"); return; } ki.select(); document.execCommand("copy"); printTerm("COPIED TO CLIPBOARD", "yellow"); }
+        function simVip(url) { document.getElementById('vipSim').innerText = "> Downloading secure protocol..."; setTimeout(()=>window.location.href=url, 1000); }
     </script>
 </body>
 </html>
