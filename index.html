@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XIT | PROTOCOL V27</title>
+    <title>XIT | PROTOCOL FIXED</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=Space+Mono&display=swap');
 
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
 
         :root {
             --bg: #020305;
@@ -26,7 +26,7 @@
         }
 
         #bgCanvas { position: absolute; inset: 0; z-index: -1; opacity: 0.3; }
-        .ambient-glow { position: absolute; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.03) 0%, transparent 80%); z-index: -2; }
+        .ambient-glow { position: absolute; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.03) 0%, transparent 80%); z-index: -2; pointer-events: none; }
 
         /* ONE-VIEWPORT CARD */
         .apex-card {
@@ -38,6 +38,7 @@
             padding: 25px;
             box-shadow: 0 40px 100px rgba(0,0,0,0.9);
             text-align: center;
+            z-index: 10;
         }
 
         /* HUD AREA */
@@ -59,17 +60,19 @@
             border-radius: 12px;
             padding: 10px; height: 55px;
             font-family: 'Space Mono', monospace; font-size: 9px;
-            color: #777; text-align: left; overflow: hidden; margin-bottom: 20px;
+            color: #777; text-align: left; overflow-y: auto; margin-bottom: 20px;
         }
-        .term-line span { color: var(--primary); margin-right: 4px; }
+        .term-line { margin-bottom: 2px; }
+        .term-line span { color: var(--primary); margin-right: 4px; font-weight: bold; }
 
-        /* SCANNER MECHANIC (THE FIX) */
+        /* SCANNER MECHANIC */
         .scan-box {
             position: relative;
             width: 120px; height: 120px;
             margin: 0 auto 20px auto;
             display: flex; justify-content: center; align-items: center;
-            /* Disable selection & calls on this specific box */
+            /* CRITICAL FIX: Stop mobile context menus natively */
+            -webkit-touch-callout: none;
             touch-action: none;
         }
 
@@ -106,12 +109,12 @@
             fill: none;
             stroke: var(--primary);
             stroke-width: 4;
-            stroke-dasharray: 377; /* 2 * PI * 60 */
+            stroke-dasharray: 377;
             stroke-dashoffset: 377;
             transition: stroke-dashoffset 0.1s linear;
         }
 
-        .status-label { font-size: 10px; font-weight: 700; color: #444; letter-spacing: 2px; margin-top: 10px; }
+        .status-label { font-size: 10px; font-weight: 700; color: #444; letter-spacing: 2px; margin-top: 10px; transition: 0.3s; }
 
         /* OUTPUT */
         .key-display {
@@ -123,7 +126,7 @@
             letter-spacing: 3px; margin-bottom: 20px;
             transition: all 0.4s;
         }
-        .key-display.ready { color: #fff; border-color: var(--primary); text-shadow: 0 0 10px var(--primary); }
+        .key-display.ready { color: #fff; border-color: var(--primary); text-shadow: 0 0 10px var(--primary); box-shadow: 0 0 20px rgba(0,229,255,0.1); }
 
         /* BUTTONS */
         .btn {
@@ -134,12 +137,13 @@
             letter-spacing: 1px; cursor: pointer; transition: 0.3s;
             margin-bottom: 10px; text-transform: uppercase;
         }
+        .btn:active { transform: scale(0.98); }
         .btn-vip { background: var(--primary); color: #000; border: none; font-weight: 800; }
 
         /* MODAL */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-card { background: #08090a; border: 1px solid #ffcc00; border-radius: 24px; padding: 30px; width: 100%; max-width: 350px; text-align: center; }
-        .wa-btn { background: #25D366; color: #000; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 800; margin-bottom: 10px; }
+        .modal-card { background: #08090a; border: 1px solid #ffcc00; border-radius: 24px; padding: 30px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 0 50px rgba(255,204,0,0.2); }
+        .wa-btn { background: #25D366; color: #000; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 800; margin-bottom: 10px; cursor: pointer; }
 
         #flash { position: fixed; inset: 0; background: #fff; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
     </style>
@@ -184,16 +188,16 @@
     <div class="modal" id="vipModal">
         <div class="modal-card">
             <h2 style="color:#ffcc00; margin-bottom:15px;">LIFETIME VIP</h2>
-            <p style="font-size: 11px; color: #555; line-height: 1.6; margin-bottom: 20px;">Manual override enabled, zero-cooldown encryption, and hardware signature locking.</p>
+            <p style="font-size: 11px; color: #666; line-height: 1.6; margin-bottom: 20px;">Manual override enabled, zero-cooldown encryption, and hardware signature locking.</p>
             <button class="wa-btn" onclick="window.open('https://wa.me/+6281225980437')">CONTACT ADMIN 1</button>
             <button class="wa-btn" onclick="window.open('https://wa.me/+6285798209865')">CONTACT ADMIN 2</button>
-            <button class="btn" onclick="closeVip()">BACK</button>
+            <button class="btn" style="border-color:#555; color:#888;" onclick="closeVip()">BACK</button>
         </div>
     </div>
 
     <script>
-        // Disable long-press menu on the whole page for safety
-        window.oncontextmenu = function(event) { event.preventDefault(); event.stopPropagation(); return false; };
+        // Disable global context menu (Anti-inspect/Anti-Hold Menu)
+        document.addEventListener('contextmenu', e => e.preventDefault());
 
         // TELEMETRY
         setInterval(() => {
@@ -222,68 +226,82 @@
         }
         init(); animate(); window.addEventListener('resize', init);
 
-        // THE HOLD FIX LOGIC
+        // HOLD MECHANIC - THE FIX
         const holdBtn = document.getElementById('holdBtn');
         const ring = document.querySelector('.progress-ring circle');
         const label = document.getElementById('label');
         const term = document.getElementById('term');
         const keyBox = document.getElementById('keyBox');
-        let progress = 0; let timer; let isSuccess = false;
+        
+        let progress = 0; 
+        let holdTimer = null; 
+        let isSuccess = false;
 
         function addLog(msg) {
             const div = document.createElement('div'); div.className = 'term-line';
             div.innerHTML = `<span>></span> ${msg}`; term.appendChild(div);
-            if(term.children.length > 3) term.removeChild(term.firstChild);
             term.scrollTop = term.scrollHeight;
         }
 
+        // Start scanning
         function startHold(e) {
             if(isSuccess) return;
-            // PREVENT DEFAULT is key to stopping mobile context menu!
-            e.preventDefault(); 
+            
+            // Only prevent default on the specific button to stop mobile text-selection/context menu.
+            // DO NOT prevent default globally.
+            if(e.cancelable) e.preventDefault(); 
+            
+            clearInterval(holdTimer);
+            progress = 0;
             
             holdBtn.classList.add('active');
             label.innerText = "AUTHENTICATING...";
             label.style.color = "#00e5ff";
             addLog("Bio-scan in progress...");
 
-            timer = setInterval(() => {
+            holdTimer = setInterval(() => {
                 progress += 2.5; 
                 ring.style.strokeDashoffset = 377 - (progress / 100) * 377;
                 
                 if(progress >= 100) {
-                    clearInterval(timer);
-                    onSuccess();
+                    clearInterval(holdTimer);
+                    triggerSuccess();
                 }
-            }, 40); // Approx 1.6s to finish
+            }, 40); // Takes exactly 1.6 seconds to fill
         }
 
-        function endHold(e) {
-            if(isSuccess) return;
-            e.preventDefault();
+        // Stop scanning
+        function stopHold() {
+            if(isSuccess || progress === 0) return;
             
-            clearInterval(timer);
-            holdBtn.classList.remove('active');
+            clearInterval(holdTimer);
             progress = 0;
             ring.style.strokeDashoffset = 377;
+            
+            holdBtn.classList.remove('active');
             label.innerText = "HOLD SENSOR";
             label.style.color = "#444";
             addLog("Scan failed: Lifted.");
         }
 
-        // Attach events with stopPropagation
+        // Safe Event Listeners
         holdBtn.addEventListener('mousedown', startHold);
         holdBtn.addEventListener('touchstart', startHold, {passive: false});
         
-        // Listen globally for lift-up so it cancels even if finger moves off button
-        window.addEventListener('mouseup', endHold);
-        window.addEventListener('touchend', endHold);
+        // Listen to window for release, but NO e.preventDefault() here!
+        window.addEventListener('mouseup', stopHold);
+        window.addEventListener('touchend', stopHold);
+        window.addEventListener('touchcancel', stopHold);
 
-        function onSuccess() {
+        // SUCCESS LOGIC
+        function triggerSuccess() {
             isSuccess = true;
             holdBtn.classList.remove('active');
-            if(navigator.vibrate) navigator.vibrate(100);
+            
+            // Vibrate on mobile
+            if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
 
+            // Flash effect
             document.getElementById('flash').style.opacity = 1;
             setTimeout(() => document.getElementById('flash').style.opacity = 0, 800);
             
@@ -292,14 +310,24 @@
             addLog("Encryption breached.");
             addLog("Key generated.");
 
+            // Generate Key
             const key = btoa(new Date().toISOString().split('T')[0] + "_XIT_SECRET_VIP");
             keyBox.classList.add('ready');
             keyBox.innerText = key;
         }
 
+        // BUTTON ACTIONS
         function copyKey() {
             if(!isSuccess) { addLog("Error: Unlocked key first."); return; }
-            navigator.clipboard.writeText(keyBox.innerText);
+            
+            // Modern copy to clipboard
+            const el = document.createElement('textarea'); 
+            el.value = keyBox.innerText;
+            document.body.appendChild(el); 
+            el.select(); 
+            document.execCommand('copy'); 
+            document.body.removeChild(el);
+            
             addLog("Signature copied.");
         }
 
